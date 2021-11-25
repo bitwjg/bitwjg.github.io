@@ -7,7 +7,7 @@
 
 # Site Settings
 locale                   : "en-US"
-title                    : "Jingang Wang / Homepage"
+title                    : "Jingang Wang's  homepage"
 title_separator          : "-"
 name                     : &name "Jingang Wang"
 description              : &description "Natural Language Processing"
@@ -57,12 +57,13 @@ yandex_site_verification :
 
 # Social Sharing
 twitter:
-  username               : &twitter
+  username               : &bitwjg
 facebook:
   username               :
   app_id                 :
   publisher              :
 og_image                 :  # Open Graph/Twitter default site image
+
 # For specifying social profiles
 # - https://developers.google.com/structured-data/customize/social-profiles
 social:
@@ -81,7 +82,7 @@ analytics:
 # Site Author
 author:
   name             : "Jingang Wang"
-  avatar           : "profile.jpeg"
+  avatar           : "profile.png"
   bio              : "Ph.D."
   location         : "Beijing"
   employer         :
@@ -96,20 +97,20 @@ author:
   flickr           :
   facebook         :
   foursquare       :
-  github           : "academicpages"
+  github           : "bitwjg"
   google_plus      :
   keybase          :
   instagram        :
   impactstory      : #"https://profiles.impactstory.org/u/xxxx-xxxx-xxxx-xxxx"
   lastfm           :
   linkedin         :
-  orcid            : "http://orcid.org/yourorcidurl"
+  orcid            :# "http://orcid.org/yourorcidurl"
   pinterest        :
   soundcloud       :
   stackoverflow    : # http://stackoverflow.com/users/123456/username
   steam            :
   tumblr           :
-  twitter          : "replacethistwitterhandle"
+  twitter          : #"replacethistwitterhandle"
   vine             :
   weibo            :
   xing             :
