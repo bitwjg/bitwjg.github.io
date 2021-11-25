@@ -1,15 +1,17 @@
----
-title: "Paper Title Number 1"
-collection: publications
-permalink: /publication/2009-10-01-paper-title-number-1
-excerpt: 'This paper is about the number 1. The number 2 is left for future work.'
-date: 2009-10-01
-venue: 'Journal 1'
-paperurl: 'http://academicpages.github.io/files/paper1.pdf'
-citation: 'Your Name, You. (2009). &quot;Paper Title Number 1.&quot; <i>Journal 1</i>. 1(1).'
----
-This paper is about the number 1. The number 2 is left for future work.
-
-[Download paper here](http://academicpages.github.io/files/paper1.pdf)
-
-Recommended citation: Your Name, You. (2009). "Paper Title Number 1." <i>Journal 1</i>. 1(1).
+- Hongyin Tang, Xingwu Sun, Beihong Jin, **Jingang Wang**, Fuzheng Zhang, Wei Wu. Improving Document Representations by Generating Pseudo Query Embeddings for Dense Retrieval. **ACL 2021.** [[Paper](https://aclanthology.org/2021.acl-long.392/)]
+- Jiahao Bu, Lei Ren, Shuang Zheng, Yang Yang, **Jingang Wang\***, Fuzheng Zhang, Wei Wu. ASAP: A Chinese Review Dataset Towards Aspect Category Sentiment Analysis and Rating Prediction. **NAACL 2021**. [[Paper](https://arxiv.org/abs/2103.06605)] [[Dataset](https://github.com/Meituan-Dianping/asap)]
+- Yang Yang, Junmei Hao, Canjia Li, Zili Wang, **Jingang Wang\***, Fuzheng Zhang, Rao Fu, Peixu Hou, Gong Zhang, Zhongyuan Wang. Query-aware Tip Generation for Vertical Search. **CIKM 2020 Applied Science Track**. [[Paper](https://arxiv.org/abs/2010.09254)]
+- Bowen Xing, Dandan Song, Lejian Liao, **Jingang Wang**, Fuzheng Zhang, Zhongyuan Wang, Heyan Huang. Earlier Attention? Aspect-Aware LSTM for Aspect-based Sentiment Analysis. **IJCAI 2019**.
+- Lerong Ma, Dandan Song, Lejian Liao, **Jingang Wang**. A Hybrid Discriminative Mixture Model for Cumulative Citation Recommendation. In *IEEE Transactions on Knowledge and Data Engineering* (**TKDE**). 2019
+- Yongchao Deng, Shanbo Cheng, Jun Lu, Kai Song, **Jingang Wang**, Shenglan Wu, Liang Yao, Guchun Zhang, Haibo Zhang, Pei Zhang, Changfeng Zhu, Boxing Chen. Alibaba's Neural Machine Translation Systems for WMT 2018. In *Proceedings of the Third Conference on Machine Translation: Shared Task Papers* (pp. 368-376).
+- **Jingang Wang**, Junfeng Tian, Long Qiu, Sheng Li, Jun Lang, Luo Si and Man Lan. A Multi-Task Learning Approach for Improving Product Title Compression With User Search Log Data. In *Proceedings of 32th AAAI Conference on Artificial Intelligence*, **AAAI 2018**. [[Paper](https://arxiv.org/abs/2010.09254)]
+- Lerong Ma, Dandan Song, Lejian Liao and **Jingang Wang**. PSVM: a preference-enhanced SVM model using preference data for classification. Science China Information Sciences 60.12 (2017): 122103.
+- **Jingang Wang,** Jingtian Jiang, Lejian Liao, Dandan Song, Zhiwei Zhang, Chin-Yew Lin. Cold Start Cumulative Citation Recommendation for Knowledge Base Acceleration**.** In *Proceedings of 38th European Conference on IR Research*, **ECIR 2016**.(Poster)
+- Zhiwei Zhang, **Jingang Wang**, Tao Wu, Pengjie Ren, Zhumin Chen, Luo Si. Supervised Local Contexts Aggregation for Effective Session Search. In *Proceedings of 38th European Conference on IR Research*, **ECIR 2016**.
+- **Jingang Wang,** Dandan Song, Zhiwei Zhang, Luo Si, Lejian Liao and Chin-Yew Lin. LDTM: A Latent Document Type Model for Cumulative Citation Recommendation. In *Proceedings of the 2015 Conference on Empirical Methods in Natural Language Processing (***EMNLP***), Lisboa, Portugal, September 2015. (Short)*[[pdf](http://www.aclweb.org/anthology/D15-1066)]
+- **Jingang Wang,** Qifan Wang, Dandan Song, Zhiwei Zhang, Luo Si, Lejian Liao and Chin-Yew Lin. An Entity Class-Dependent Discriminative Mixture Model for Cumulative Citation Recommendation. In: *SIGIR 2015: 38th international ACM SIGIR conference on Research and development in information retrieval (***SIGIR***), Santiago, Chile, August 2015.* [[pdf](http://dl.acm.org/citation.cfm?id=2767698&CFID=533722402&CFTOKEN=41421125)]
+- **Jingang Wang**, Lejian Liao, Dandan Song, Lerong Ma, Chin-Yew Lin and Yong Rui. Resorting Relevance Evidences to Cumulative Citation Recommendation for Knowledge Base Acceleration. *In Proceedings of 16th International Conference on Web-Age Information Management (WAIM), Qingdao, China, Jun. 2015.* [[pdf](http://link.springer.com/chapter/10.1007/978-3-319-21042-1_14)]
+- **Jingang Wang**, Ning Zhang, Zhiwei Zhang, Dandan Song, Luo Si and Lejian Liao. BIT and Purdue at TREC-KBA-CCR Track 2014. In Proceedings of 23rd Text Retreieval Conference (TREC), Gaithersburg, MD, US, Nov. 2014. [[pdf](http://trec.nist.gov/pubs/trec23/papers/pro-BIT-Purdue_kba.pdf)]
+- **Jingang Wang**, Dandan Song, Chin-Yew Lin and Lejian Liao. BIT and MSRA at TREC KBA CCR Track 2013, *In Proceedings of 22nd Text REtrieval Conference (TREC), Gaithersburg, MD, US, Nov. 2013.* [[pdf](http://trec.nist.gov/pubs/trec22/papers/BIT-MSRA-kba.pdf)] (The **1st place** team at KBA-CCR task.)
+- **Jingang Wang**, Dandan Song, Lejian Liao and Wei Zou, The Chinese Bag-of-opinions Method for Hot-Topic-Oriented Sentiment Analysis on Weibo, *In Proceedings of Jointed Conference of 6th Chinese Semantic Web Symposium and The 1st Chinese Web Science Conference (CSWS), Shenzhen, China, Nov. 2012.* [[pdf](http://link.springer.com/chapter/10.1007/978-1-4614-6880-6_31#page-1)]
+- Guoqiang Li, Lejian Liao, Dandan Song, **Jingang Wang**, Fuzhen Sun and Guangcheng Liang, A Self-healing Framework for QoS-aware Web Service Composition via Case-based Reasoning, *In Proceedings of 15th Asia-Pacific Web conference (AP-Web), Sydney, Australia, Apr. 2013.* [[pdf](http://link.springer.com/chapter/10.1007%2F978-3-642-37401-2_64)]
