@@ -40,7 +40,7 @@ html {
 }
 
 .banner {
-  background: linear-gradient(90deg, rgba(198, 90, 31, 0.12), rgba(31, 111, 198, 0.12));
+  background: linear-gradient(90deg, rgba(198, 90, 31, 0.16), rgba(31, 111, 198, 0.16));
   border-bottom: 1px solid var(--stroke);
 }
 
@@ -49,13 +49,16 @@ html {
   align-items: center;
   gap: 16px;
   padding: 14px 6vw;
+  justify-content: center;
 }
 
 .banner__text {
   font-family: "IBM Plex Serif", serif;
-  font-size: 18px;
+  font-size: 22px;
   font-weight: 600;
   color: var(--ink);
+  text-align: center;
+  width: 100%;
 }
 
 .masthead__inner {
