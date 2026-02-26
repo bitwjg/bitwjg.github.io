@@ -20,10 +20,59 @@ body {
   background: radial-gradient(1200px 600px at 20% 0%, var(--bg) 0%, var(--bg-2) 40%, #efe9df 100%);
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 .page {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+}
+
+.masthead {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: rgba(255, 255, 255, 0.95);
+  border-bottom: 1px solid var(--stroke);
+  backdrop-filter: blur(10px);
+}
+
+.masthead__inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 12px 6vw;
+}
+
+.masthead__title {
+  font-family: "IBM Plex Serif", serif;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.masthead__nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.masthead__nav a {
+  text-decoration: none;
+  color: var(--muted);
+  border-bottom: 2px solid transparent;
+  padding-bottom: 2px;
+  transition: color 0.2s ease, border-color 0.2s ease;
+}
+
+.masthead__nav a:hover {
+  color: var(--accent);
+  border-color: var(--accent);
 }
 
 .topbar {
@@ -130,6 +179,7 @@ body {
   padding: 20px 24px;
   margin-bottom: 18px;
   box-shadow: 0 10px 25px rgba(32, 31, 26, 0.05);
+  scroll-margin-top: 90px;
 }
 
 .section-header {
@@ -189,6 +239,45 @@ body {
   font-size: 14px;
 }
 
+.pub-year {
+  border: 1px solid var(--stroke);
+  border-radius: 16px;
+  padding: 12px 14px;
+  background: rgba(255, 255, 255, 0.7);
+}
+
+.pub-year + .pub-year {
+  margin-top: 12px;
+}
+
+.pub-year-title {
+  font-family: "IBM Plex Serif", serif;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--accent);
+  cursor: pointer;
+  list-style: none;
+}
+
+.pub-year-title::-webkit-details-marker {
+  display: none;
+}
+
+.pub-year-title::before {
+  content: "▸";
+  display: inline-block;
+  margin-right: 8px;
+  transition: transform 0.2s ease;
+}
+
+.pub-year[open] .pub-year-title::before {
+  transform: rotate(90deg);
+}
+
+.pub-year .pubs {
+  margin-top: 10px;
+}
+
 .footer {
   padding: 14px 6vw 24px;
   color: var(--muted);
@@ -202,5 +291,10 @@ body {
 
   .sidebar .card {
     position: static;
+  }
+
+  .masthead__inner {
+    align-items: flex-start;
+    flex-direction: column;
   }
 }
