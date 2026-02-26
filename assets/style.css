@@ -39,6 +39,25 @@ html {
   backdrop-filter: blur(10px);
 }
 
+.banner {
+  background: linear-gradient(90deg, rgba(198, 90, 31, 0.12), rgba(31, 111, 198, 0.12));
+  border-bottom: 1px solid var(--stroke);
+}
+
+.banner__inner {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 6vw;
+}
+
+.banner__text {
+  font-family: "IBM Plex Serif", serif;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
 .masthead__inner {
   display: flex;
   align-items: center;
