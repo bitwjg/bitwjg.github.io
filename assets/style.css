@@ -34,7 +34,7 @@ html {
   position: sticky;
   top: 0;
   z-index: 50;
-  background: rgba(255, 255, 255, 0.95);
+  background: linear-gradient(90deg, rgba(246, 235, 217, 0.98), rgba(234, 222, 206, 0.98));
   border-bottom: 1px solid var(--stroke);
   backdrop-filter: blur(10px);
 }
@@ -204,6 +204,21 @@ html {
   scroll-margin-top: 90px;
 }
 
+.section-highlight {
+  animation: sectionFlash 1.2s ease;
+  border-color: rgba(198, 90, 31, 0.6);
+  box-shadow: 0 12px 30px rgba(198, 90, 31, 0.18);
+}
+
+@keyframes sectionFlash {
+  0% {
+    background: rgba(255, 250, 242, 0.9);
+  }
+  100% {
+    background: rgba(255, 255, 255, 0.55);
+  }
+}
+
 .section-header {
   display: flex;
   justify-content: space-between;
@@ -215,6 +230,12 @@ html {
   font-family: "IBM Plex Serif", serif;
   font-size: 20px;
   margin: 0 0 12px;
+}
+
+.section-subtitle {
+  margin: 8px 0 10px;
+  font-weight: 600;
+  color: var(--accent);
 }
 
 .section-note {
