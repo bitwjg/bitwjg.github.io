@@ -252,6 +252,29 @@ html {
   color: var(--ink);
 }
 
+.blog-list {
+  margin-top: 12px;
+  display: grid;
+  gap: 10px;
+}
+
+.blog-item {
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px dashed var(--stroke);
+  background: rgba(255, 255, 255, 0.7);
+}
+
+.blog-title {
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.blog-meta {
+  font-size: 12px;
+  color: var(--muted);
+}
+
 .list {
   list-style: none;
   padding: 0;
