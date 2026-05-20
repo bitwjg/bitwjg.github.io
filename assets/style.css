@@ -75,6 +75,11 @@ html {
   font-weight: 600;
 }
 
+.masthead__home {
+  color: var(--ink);
+  text-decoration: none;
+}
+
 .masthead__nav {
   display: flex;
   flex-wrap: wrap;
@@ -252,10 +257,25 @@ html {
   color: var(--ink);
 }
 
+.highlight-note {
+  margin: 16px 0 0;
+  padding: 12px 14px;
+  border-left: 4px solid var(--accent);
+  border-radius: 8px;
+  background: rgba(198, 90, 31, 0.1);
+  color: #8f3d13;
+  font-weight: 600;
+  line-height: 1.6;
+}
+
 .blog-list {
   margin-top: 12px;
   display: grid;
   gap: 10px;
+}
+
+.blog-list--standalone {
+  margin-top: 18px;
 }
 
 .blog-item {
@@ -270,9 +290,50 @@ html {
   margin-bottom: 4px;
 }
 
+.blog-title a {
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.blog-title a:hover {
+  color: var(--accent);
+}
+
 .blog-meta {
   font-size: 12px;
   color: var(--muted);
+}
+
+.blog-more {
+  margin-top: 14px;
+}
+
+.blog-more a,
+.back-link {
+  color: var(--accent-2);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.blog-more a:hover,
+.back-link:hover {
+  text-decoration: underline;
+}
+
+.single-page {
+  max-width: 920px;
+  margin: 0 auto;
+  padding: 36px 6vw 56px;
+}
+
+.post-title {
+  font-family: "IBM Plex Serif", serif;
+  font-size: 30px;
+  margin: 12px 0 8px;
+}
+
+.post p {
+  line-height: 1.7;
 }
 
 .list {

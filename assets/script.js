@@ -28,9 +28,11 @@ function highlightSection(targetId) {
   }, 1200);
 }
 
-toggle.addEventListener("click", () => {
-  applyLanguage(current === "en" ? "zh" : "en");
-});
+if (toggle) {
+  toggle.addEventListener("click", () => {
+    applyLanguage(current === "en" ? "zh" : "en");
+  });
+}
 
 navLinks.forEach((link) => {
   link.addEventListener("click", () => {
