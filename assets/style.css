@@ -260,14 +260,23 @@ html {
 .highlight-note {
   margin: 16px 0 0;
   padding: 14px 16px;
-  border: 1px solid rgba(198, 90, 31, 0.35);
-  border-left: 5px solid var(--accent);
+  border: 1px solid rgba(198, 90, 31, 0.22);
+  border-left: 4px solid var(--accent);
   border-radius: 8px;
-  background: linear-gradient(90deg, rgba(198, 90, 31, 0.16), rgba(255, 250, 242, 0.92));
+  background: rgba(255, 250, 242, 0.78);
+  color: var(--ink);
+  font-weight: 500;
+  line-height: 1.6;
+}
+
+.keyword-highlight {
+  display: inline-block;
+  padding: 1px 6px 2px;
+  border: 1px solid rgba(198, 90, 31, 0.28);
+  border-radius: 6px;
+  background: rgba(198, 90, 31, 0.14);
   color: #78320f;
   font-weight: 700;
-  line-height: 1.6;
-  box-shadow: 0 8px 20px rgba(198, 90, 31, 0.12);
 }
 
 .blog-list {
