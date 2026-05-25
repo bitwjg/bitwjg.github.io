@@ -2,6 +2,9 @@ const toggle = document.getElementById("langToggle");
 const textNodes = document.querySelectorAll("[data-en]");
 let current = "en";
 const navLinks = document.querySelectorAll(".masthead__nav a");
+const pubFilterButtons = document.querySelectorAll(".pub-filter-btn");
+const pubYearGroups = document.querySelectorAll(".pub-year");
+const pubFilterEmpty = document.querySelector(".pub-filter-empty");
 
 function applyLanguage(lang) {
   current = lang;
@@ -26,7 +29,7 @@ function renderHiringNote(lang) {
 }
 
 function highlightSection(targetId) {
-  if (!targetId) return;
+  if (!targetId || !targetId.startsWith("#")) return;
   const section = document.querySelector(targetId);
   if (!section) return;
   section.classList.remove("section-highlight");
@@ -37,6 +40,43 @@ function highlightSection(targetId) {
   section.__highlightTimer = window.setTimeout(() => {
     section.classList.remove("section-highlight");
   }, 1200);
+}
+
+function setPublicationFilter(keyword) {
+  const selectedKeyword = keyword || "all";
+  let totalMatches = 0;
+
+  pubFilterButtons.forEach((button) => {
+    const isActive = button.dataset.keyword === selectedKeyword;
+    button.classList.toggle("is-active", isActive);
+    button.setAttribute("aria-pressed", String(isActive));
+  });
+
+  pubYearGroups.forEach((group) => {
+    const publications = Array.from(group.querySelectorAll(".pub"));
+    let groupMatches = 0;
+
+    publications.forEach((publication) => {
+      const keywords = (publication.dataset.keywords || "").split("|");
+      const isMatch = selectedKeyword === "all" || keywords.includes(selectedKeyword);
+      publication.hidden = !isMatch;
+      if (isMatch) {
+        groupMatches += 1;
+      }
+    });
+
+    totalMatches += groupMatches;
+    group.hidden = groupMatches === 0;
+    if (selectedKeyword === "all") {
+      group.open = group.dataset.initialOpen === "true";
+    } else if (groupMatches > 0) {
+      group.open = true;
+    }
+  });
+
+  if (pubFilterEmpty) {
+    pubFilterEmpty.hidden = totalMatches > 0;
+  }
 }
 
 if (toggle) {
@@ -52,8 +92,19 @@ navLinks.forEach((link) => {
   });
 });
 
+pubYearGroups.forEach((group) => {
+  group.dataset.initialOpen = group.open ? "true" : "false";
+});
+
+pubFilterButtons.forEach((button) => {
+  button.addEventListener("click", () => {
+    setPublicationFilter(button.dataset.keyword);
+  });
+});
+
 window.addEventListener("hashchange", () => {
   highlightSection(window.location.hash);
 });
 
 applyLanguage("en");
+setPublicationFilter("all");

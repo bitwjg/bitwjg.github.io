@@ -368,6 +368,53 @@ html {
   gap: 10px;
 }
 
+.pub-filter {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: 4px 0 16px;
+}
+
+.pub-filter-label {
+  width: 100%;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.pub-filter-btn {
+  border: 1px solid var(--stroke);
+  border-radius: 999px;
+  background: rgba(255, 250, 242, 0.82);
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 6px 10px;
+  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
+}
+
+.pub-filter-btn:hover {
+  border-color: rgba(198, 90, 31, 0.5);
+  color: var(--accent);
+  transform: translateY(-1px);
+}
+
+.pub-filter-btn.is-active {
+  background: rgba(198, 90, 31, 0.13);
+  border-color: rgba(198, 90, 31, 0.55);
+  color: var(--accent);
+}
+
+.pub-filter-empty {
+  margin: 8px 0 0;
+  color: var(--muted);
+  font-size: 14px;
+}
+
 .pub {
   padding: 12px 14px;
   border-radius: 12px;
