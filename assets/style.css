@@ -257,6 +257,14 @@ html {
   color: var(--ink);
 }
 
+.inline-interests {
+  margin: 12px 0 0;
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.6;
+}
+
 .highlight-note {
   margin: 16px 0 0;
   padding: 14px 16px;
