@@ -62,6 +62,11 @@
         <p>The design follows directly from that question: compare two sizes inside each family, fix the task and generation protocol, sweep multiple output budgets, repeat each problem, and admit token-efficiency evidence only after final-validity, token-partition, and truncation gates pass.</p>
         <p>GPT-5.5 and GPT-5.6 were research collaborators throughout the project. They helped trace and challenge the hypothesis, design the matrix, audit remote runs, diagnose measurement failures, analyze accepted artifacts, and prepare the report, paper draft, and this article. They are not evidence for the conclusion: every empirical claim below comes from logged jobs and validated result files.</p>
 
+        <h2>From a broad model screen to two controlled families</h2>
+        <p>The project did not begin with two hand-picked winners. The initial candidate pool included GPT-OSS, Qwen3.5 Dense, Ministral-3, Qwen3, and GLM-4.5. We piloted each family, then asked whether it could support an interpretable within-family scale comparison.</p>
+        <div class="method-note"><strong>Admission contract.</strong> A family needed two meaningfully comparable sizes; matched tokenizer, template, parser, and generation protocol; enough task, budget, and repeated-sampling coverage; and final-validity, token-partition, and truncation quality sufficient for trustworthy token measurement.</div>
+        <p>GPT-OSS and Qwen3.5 Dense survived that screen. Ministral-3, Qwen3, and GLM-4.5 were not removed because their results were inconvenient: they exposed measurement failure, architecture confounding, genuine scale reversal, and inference-budget interaction. The evidence scope was frozen by <strong>comparability and measurement validity</strong>, not by which family confirmed the hypothesis.</p>
+
         <h2>Experimental setup</h2>
         <div class="table-wrap">
           <table class="post-table">
@@ -121,14 +126,41 @@
         <p>The Qwen3.5 AIME failures initially looked like a parser bug. Artifact inspection showed that they were mainly model behavior. Qwen3.5 preserves a valid thinking/answer partition but often consumes the budget before emitting a terminal answer. The dominant failure is therefore an incomplete reasoning-to-final transition, not a global extraction bug.</p>
         <p>That diagnosis matters because blindly rerunning the same configuration would not automatically fix a systematic finalization pattern. We retained strict accuracy, censored token-efficiency claims where required, and avoided selecting only well-finalized traces.</p>
 
-        <h2>Why three exploratory families did not enter the main result</h2>
-        <p>These exclusions have different causes and should not be collapsed into one generic “gate failure”:</p>
-        <ul>
-          <li><strong>Ministral-3 — completed runs, but no admissible efficiency comparison.</strong> No final comparison passed the full validity, partition, and truncation contract. The main AIME problem was an incomplete reasoning-to-final transition, while MATH500 also showed a substantive 32K quality reversal: 14B reached 7.0% accuracy versus 31.6% for 8B.</li>
-          <li><strong>Qwen3 — suggestive pilot, but not a clean controlled scale result.</strong> The larger model improved average AIME accuracy and used fewer total tokens, but had slightly lower <code>pass@8</code>. On MATH500, 30B was both more accurate (94.2% versus 89.8%) and shorter (3.34K versus 4.04K total tokens). Different MoE activation scales and incomplete matrix scope confound the scale interpretation.</li>
-          <li><strong>GLM-4.5 — a real counterexample entangled with budget and finalization.</strong> On 32K AIME, Air beat full GLM-4.5 on <code>avg@8</code> (64.4% versus 55.0%) and <code>pass@8</code> (91.7% versus 83.3%), with lower truncation. GPQA reversed direction, but both models remained below the final-validity gate despite valid token partitions. This is an exit-reasoning and cap-interaction problem, not a parser failure.</li>
-        </ul>
-        <p>“Excluded from the main result” can therefore mean invalid token measurement, a confounded comparison, or a genuine counterexample. Those are scientifically different outcomes.</p>
+        <h2>What the three ineligible families taught us</h2>
+        <p>The screening outcome becomes more useful when failure is separated into parser behavior, model finalization, substantive scale effects, and inference-configuration interactions.</p>
+        <div class="table-wrap">
+          <table class="post-table">
+            <thead><tr><th>Family</th><th>Parser / partition</th><th>Scale evidence</th><th>Classification</th></tr></thead>
+            <tbody>
+              <tr><td>Ministral-3</td><td>Completed streams parse; missing finals originate upstream.</td><td>14B loses to 8B on MATH500.</td><td>Measurement failure + real reversal</td></tr>
+              <tr><td>Qwen3</td><td>No primary parser failure.</td><td>AIME leans larger; MATH500 favors smaller.</td><td>Scale not identifiable</td></tr>
+              <tr><td>GLM-4.5</td><td>Token partitions are valid.</td><td>Air wins on AIME; GPQA reverses.</td><td>Counterexample + cap sensitivity</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>Ministral-3: not merely a parser bug</h3>
+        <p>The K=8 runs completed, but no final comparison passed the full validity, partition, and truncation contract. The official parser correctly handled completed streams. The dominant AIME failure occurred earlier: the model spent its budget in reasoning without emitting a terminal answer. The parser exposed these incomplete streams; it did not create them.</p>
+        <p>MATH500 at 32K also contains a substantive reversal: 14B reaches only <strong>7.0%</strong> accuracy versus <strong>31.6%</strong> for 8B. Parser repair alone therefore cannot recover the hypothesis. The supported diagnosis combines reasoning-to-final measurement failure with a real smaller-model advantage; template, post-training, and inference-setting mechanisms remain unresolved.</p>
+
+        <h3>Qwen3: successful execution, but scale is not a clean variable</h3>
+        <p>The pilot ran and parsing was not the limiting factor. Qwen3-235B-A22B improved average AIME accuracy and used fewer total tokens than 30B-A3B, although <code>pass@8</code> was slightly lower. On MATH500, 30B-A3B was both more accurate (<strong>94.2% versus 89.8%</strong>) and shorter (<strong>3.34K versus 4.04K</strong> total tokens).</p>
+        <p>This comparison mixes total parameters, active MoE parameters, routing/architecture, post-training, and incomplete matrix scope. It supports a benchmark-dependent reversal, not a clean parameter-scale claim. Community comparisons of MoE families should report total and active parameters, routing, and post-training separately.</p>
+
+        <h3>GLM-4.5: a counterexample plus inference-setting sensitivity</h3>
+        <p>On 32K AIME, GLM-4.5-Air beats full GLM-4.5 on <code>avg@8</code> (<strong>64.4% versus 55.0%</strong>) and <code>pass@8</code> (<strong>91.7% versus 83.3%</strong>), while the larger model truncates more often. Valid token partitions rule out a global parser failure.</p>
+        <p>GPQA reverses direction, while both models remain below the final-validity gate. The AIME smaller-model win is real under the tested setup, but its cross-task interpretation is entangled with cap and exit-reasoning behavior. The informative follow-up is a small ablation over budgets, templates, stop conditions, and forced finalization—not a blind rerun.</p>
+
+        <h3>A reusable diagnostic order</h3>
+        <ol>
+          <li>Separate completed execution from eligible measurement.</li>
+          <li>Unit-test parsers on complete streams and control tasks.</li>
+          <li>Keep strict accuracy while censoring ineligible token lengths.</li>
+          <li>Sweep output caps before attributing failure to capability.</li>
+          <li>Treat active MoE scale and post-training as confounders.</li>
+          <li>Preserve valid smaller-model wins as counterexamples.</li>
+        </ol>
+        <p>“Excluded from the main result” can mean invalid measurement, a non-identifiable comparison, or a genuinely better smaller model. Those are scientifically different outcomes.</p>
 
         <h2>What I believe after the experiment</h2>
         <blockquote>Within some controlled model families, a larger model can achieve equal or better quality with fewer visible reasoning tokens. The effect is strong for GPT-OSS and present but narrower for Qwen3.5.</blockquote>
@@ -169,6 +201,11 @@
         <blockquote>在同一模型家族内，当任务、输出预算、解码规则和重复种子都保持一致时，增大模型规模是否会把“质量—推理 token”前沿推向更优的位置？</blockquote>
         <p>实验设计直接从这个问题推出：在每个家族内比较两个规模，固定任务和生成协议，扫描多档输出预算，对每道题进行重复采样；只有最终答案有效率、token 分区和截断率都通过预设门禁时，才允许进入 token 效率比较。</p>
         <p>GPT-5.5 和 GPT-5.6 作为研究协作者参与了整个流程：追溯和质疑原始假设、设计实验矩阵、审计远端任务、诊断测量失败、分析验收后的产物，以及协助准备实验报告、论文初稿和这篇文章。它们本身不是结论的证据；下面每个实证数字都来自可复核的任务日志和通过验收的结果文件。</p>
+
+        <h2>从广泛选型到两个正式实验家族</h2>
+        <p>项目并不是从两个“答案正确”的家族开始。最初的候选池包括 GPT-OSS、Qwen3.5 Dense、Ministral-3、Qwen3 和 GLM-4.5。我们先做 pilot，再判断每个家族能否形成可解释的同家族尺度对照。</p>
+        <div class="method-note"><strong>进入正式矩阵的条件。</strong>同家族内至少有两个可比较规模；tokenizer、模板、解析器和生成协议能够匹配；任务、预算和重复采样覆盖足够；final validity、token 分区与截断率允许可靠测量 token。</div>
+        <p>筛选后，GPT-OSS 和 Qwen3.5 Dense 形成最清楚的受控比较。Ministral-3、Qwen3 和 GLM-4.5 并不是因为结果“不漂亮”才被删除：它们分别暴露了测量失效、架构混杂、真实尺度反转与推理预算交互。证据范围是按<strong>可比性与测量有效性</strong>冻结的，而不是按哪个家族支持假设来挑选。</p>
 
         <h2>实验设置</h2>
         <div class="table-wrap">
@@ -229,14 +266,41 @@
         <p>Qwen3.5 的 AIME 失败一开始看上去很像解析器问题。逐条检查产物后发现，主要原因其实是模型行为。thinking/answer 分区本身有效，但长推理经常耗尽预算，来不及输出终止性的最终答案。主要失败因此是 reasoning-to-final 转换没有完成，而不是全局性的抽取错误。</p>
         <p>这个诊断很重要，因为用同一配置大规模补跑，并不会自动解决系统性的收尾行为。因此我们保留严格准确率，在需要时删失 token 效率结论，也不通过只保留“收尾良好”的样本来人为修复数据。</p>
 
-        <h2>为什么三个探索性家族没有进入主结果</h2>
-        <p>这三个家族被排除的原因并不相同，不能都概括成一句“没有通过门禁”：</p>
-        <ul>
-          <li><strong>Ministral-3：运行完整，但没有形成可采纳的效率比较。</strong>没有最终比较同时通过有效性、分区与截断率合同。AIME 的主要问题是 reasoning-to-final 转换不完整；MATH500 32K 还出现实质性质量反转，14B 只有 7.0%，低于 8B 的 31.6%。</li>
-          <li><strong>Qwen3：pilot 有启发，但不是干净的受控规模结论。</strong>大模型在 AIME 上平均准确率更高、total tokens 更少，但 <code>pass@8</code> 略低；MATH500 上 30B 同时更准（94.2% 对 89.8%）且更短（3.34K 对 4.04K）。不同 MoE 激活规模与不完整矩阵范围使规模解释存在混杂。</li>
-          <li><strong>GLM-4.5：真实反例，同时受预算和收尾行为影响。</strong>32K AIME 上，Air 的 <code>avg@8</code>（64.4%）和 <code>pass@8</code>（91.7%）都高于完整 GLM-4.5（55.0% 与 83.3%），截断率也更低。GPQA 上方向反转，但两者最终答案有效率仍低于门禁，尽管 token 分区有效。这是退出推理与预算交互问题，不是解析器故障。</li>
-        </ul>
-        <p>所以，“没有进入主结果”可能意味着 token 测量无效、比较存在混杂，或模型确实构成反例。这三种科学结论不能混为一谈。</p>
+        <h2>三个未通过家族告诉了我们什么</h2>
+        <p>把失败进一步拆开，需要分别判断解析器、模型收尾、真实尺度效应，以及架构/推理配置交互。</p>
+        <div class="table-wrap">
+          <table class="post-table">
+            <thead><tr><th>家族</th><th>解析器 / 分区</th><th>尺度现象</th><th>分类</th></tr></thead>
+            <tbody>
+              <tr><td>Ministral-3</td><td>完整流可解析；缺失 final 发生在上游。</td><td>MATH500 上 14B 弱于 8B。</td><td>测量失效 + 真实反转</td></tr>
+              <tr><td>Qwen3</td><td>没有主要解析器故障。</td><td>AIME 偏向大模型，MATH500 偏向小模型。</td><td>规模变量不可识别</td></tr>
+              <tr><td>GLM-4.5</td><td>token 分区有效。</td><td>AIME 上 Air 胜出，GPQA 方向相反。</td><td>反例 + 预算敏感</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>Ministral-3：不是单纯的解析器故障</h3>
+        <p>K=8 运行覆盖完整，但没有比较通过有效性、分区与截断率的联合门禁。官方解析器能正确处理完整生成流；AIME 的主要失败发生得更早——模型把预算消耗在 reasoning 中，却没有输出终止性的 final。解析器只是暴露了不完整流，并不是根因。</p>
+        <p>MATH500 32K 还出现实质性反转：14B 只有 <strong>7.0%</strong>，8B 为 <strong>31.6%</strong>。因此不能用“修好 parser，大模型就会赢”解释。现有证据同时指向 reasoning-to-final 测量失效和真实的小模型优势；模板、后训练或推理配置的具体责任仍需消融。</p>
+
+        <h3>Qwen3：运行成功，但“规模”不是干净变量</h3>
+        <p>pilot 执行成功，解析也不是限制因素。235B-A22B 在 AIME 上平均准确率更高、total tokens 更少，但 <code>pass@8</code> 略低；MATH500 上，30B-A3B 同时更准（<strong>94.2% 对 89.8%</strong>）且更短（<strong>3.34K 对 4.04K</strong> total tokens）。</p>
+        <p>这组比较混合了总参数、MoE 激活参数、路由/架构、后训练和不完整矩阵范围。它支持“结果依赖 benchmark”，却不能干净归因于参数规模。社区比较 MoE 家族时，应分别报告总参数、激活参数、路由和后训练协议。</p>
+
+        <h3>GLM-4.5：真实反例叠加推理配置敏感性</h3>
+        <p>32K AIME 上，GLM-4.5-Air 的 <code>avg@8</code>（<strong>64.4% 对 55.0%</strong>）和 <code>pass@8</code>（<strong>91.7% 对 83.3%</strong>）都高于完整模型，且大模型截断更多。两者 token 分区有效，因此不能归咎于全局 parser 故障。</p>
+        <p>GPQA 的尺度方向相反，同时两个模型 final validity 都低于门禁。AIME 上小模型胜出是真实观察，但跨任务解释受到预算与退出推理行为影响。正确的后续实验是对预算、模板、终止条件和强制收尾做小规模消融，而不是盲目补跑同配置。</p>
+
+        <h3>一套可复用的诊断顺序</h3>
+        <ol>
+          <li>区分“任务跑完”和“测量合格”；</li>
+          <li>用完整生成流和控制任务单测 parser；</li>
+          <li>保留严格准确率，同时删失不合格 token 长度；</li>
+          <li>扫描多档预算，再判断是否属于能力问题；</li>
+          <li>把 MoE 激活规模与后训练视为混杂变量；</li>
+          <li>保留有效的小模型胜出，把它当作真实反例。</li>
+        </ol>
+        <p>所以，“没有进入主结果”可能意味着测量无效、因果比较不可识别，或者小模型确实更好。这三种科学结论不能混为一谈。</p>
 
         <h2>实验之后，我如何理解这个问题</h2>
         <blockquote>在某些受控模型家族内，更大的模型可以用更少的可见推理 token 达到相同或更高质量。这个效应在 GPT-OSS 上很强，在 Qwen3.5 上方向一致但证据更窄。</blockquote>
