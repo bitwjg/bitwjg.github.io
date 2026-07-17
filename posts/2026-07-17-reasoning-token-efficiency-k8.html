@@ -142,14 +142,20 @@
         <h3>Ministral-3: not merely a parser bug</h3>
         <p>The K=8 runs completed, but no final comparison passed the full validity, partition, and truncation contract. The official parser correctly handled completed streams. The dominant AIME failure occurred earlier: the model spent its budget in reasoning without emitting a terminal answer. The parser exposed these incomplete streams; it did not create them.</p>
         <p>MATH500 at 32K also contains a substantive reversal: 14B reaches only <strong>7.0%</strong> accuracy versus <strong>31.6%</strong> for 8B. Parser repair alone therefore cannot recover the hypothesis. The supported diagnosis combines reasoning-to-final measurement failure with a real smaller-model advantage; template, post-training, and inference-setting mechanisms remain unresolved.</p>
+        <p>The technical report makes this result less mysterious without proving its cause. Ministral 3 is built by sequentially pruning, continuing training, and distilling <strong>14B→8B→3B</strong> from Mistral Small 3.1, so 8B and 14B are not independent, recipe-matched scale points. Its ablations also show that teacher choice materially affects math. Distillation path and teacher–student compatibility are therefore plausible sources of non-monotonic scaling, not established explanations for our reversal.</p>
+        <p>The finalization link is more direct: the Reasoning recipe combines short/long-CoT SFT, GRPO, and ODPO, and the authors increased RL generation length from <strong>32K to 80K</strong> after observing non-trivial truncation. Our 32K gate is probing a long-reasoning sensitivity documented by the recipe, not an arbitrary parser defect.</p>
 
         <h3>Qwen3: successful execution, but scale is not a clean variable</h3>
         <p>The pilot ran and parsing was not the limiting factor. Qwen3-235B-A22B improved average AIME accuracy and used fewer total tokens than 30B-A3B, although <code>pass@8</code> was slightly lower. On MATH500, 30B-A3B was both more accurate (<strong>94.2% versus 89.8%</strong>) and shorter (<strong>3.34K versus 4.04K</strong> total tokens).</p>
         <p>This comparison mixes total parameters, active MoE parameters, routing/architecture, post-training, and incomplete matrix scope. It supports a benchmark-dependent reversal, not a clean parameter-scale claim. Community comparisons of MoE families should report total and active parameters, routing, and post-training separately.</p>
+        <p>The Qwen3 report confirms the confounding. 30B-A3B has <strong>3B active parameters and 48 layers</strong>; 235B-A22B has <strong>22B active parameters and 94 layers</strong>. The lightweight 30B model also receives off-policy and on-policy strong-to-weak distillation, while the flagship 235B follows the full four-stage reasoning/general-RL pipeline. A distilled smaller policy may compress high-value teacher trajectories more effectively, but our pilot cannot prove that mechanism.</p>
+        <p>Official inference differs too. Qwen3's thinking-budget control inserts an instruction to stop thinking and answer rather than hard-stopping at the threshold, and official AIME evaluation uses <strong>38,912</strong> tokens. Our hard 32K cap had no forced reasoning-to-final conversion. This may explain some AIME missing finals, but it cannot explain the MATH500 reversal.</p>
 
         <h3>GLM-4.5: a counterexample plus inference-setting sensitivity</h3>
         <p>On 32K AIME, GLM-4.5-Air beats full GLM-4.5 on <code>avg@8</code> (<strong>64.4% versus 55.0%</strong>) and <code>pass@8</code> (<strong>91.7% versus 83.3%</strong>), while the larger model truncates more often. Valid token partitions rule out a global parser failure.</p>
         <p>GPQA reverses direction, while both models remain below the final-validity gate. The AIME smaller-model win is real under the tested setup, but its cross-task interpretation is entangled with cap and exit-reasoning behavior. The informative follow-up is a small ablation over budgets, templates, stop conditions, and forced finalization—not a blind rerun.</p>
+        <p>The GLM-4.5 report describes Air and full GLM as <strong>106B/12B-active</strong> and <strong>355B/32B-active</strong> MoE systems. Post-training first builds reasoning, agent, and chat experts, then self-distills them into a hybrid thinking/direct-response policy. The authors found gradual output-length expansion difficult to recover from and therefore ran final reasoning RL directly at <strong>64K</strong>. Our 32K cap can plausibly amplify truncation and exit differences.</p>
+        <p>But cap mismatch is not sufficient. In our existing seed-0-only 64K diagnostic, mean strict AIME24/25 accuracy still favors Air (<strong>55.0% versus 50.0%</strong>), with truncation around <strong>23.3%–30.0%</strong>. This slice is not a replacement for K=8, but doubling the cap did not restore larger-model dominance. Hybrid distillation, active-scale differences, or long-reasoning policy may still contribute.</p>
 
         <h3>A reusable diagnostic order</h3>
         <ol>
@@ -182,6 +188,9 @@
           <li><a href="https://www.latent.space/p/noam-brown" target="_blank" rel="noreferrer">Noam Brown, <em>Scaling Test Time Compute to Multi-Agent Civilizations</em></a>, Latent Space, June 20, 2025.</li>
           <li><a href="https://www.youtube.com/watch?v=DhD1zZ8w8Mw&amp;t=1209s" target="_blank" rel="noreferrer">Yann Dubois, <em>OpenAI's Yann Dubois: Why AI Progress Suddenly Feels Real</em></a>, The MAD Podcast with Matt Turck, May 21, 2026; role introduction at 00:36, reasoning-efficiency chapter at 20:09, and expert-path analogy at 22:01.</li>
           <li><a href="https://www.youtube.com/watch?v=botHQ7u6-Jk" target="_blank" rel="noreferrer">Josh McGrath, <em>[State of Post-Training] From GPT-4.1 to 5.1: RLVR, Agent &amp; Token Efficiency</em></a>, December 31, 2025; token-efficiency chapter at 13:12.</li>
+          <li><a href="https://arxiv.org/abs/2601.08584" target="_blank" rel="noreferrer">Liu et al., <em>Ministral 3</em></a>, arXiv:2601.08584, 2026.</li>
+          <li><a href="https://arxiv.org/abs/2505.09388" target="_blank" rel="noreferrer">Yang et al., <em>Qwen3 Technical Report</em></a>, arXiv:2505.09388, 2025.</li>
+          <li><a href="https://arxiv.org/abs/2508.06471" target="_blank" rel="noreferrer">Zeng et al., <em>GLM-4.5: Agentic, Reasoning, and Coding (ARC) Foundation Models</em></a>, arXiv:2508.06471, 2025.</li>
         </ol>
       </div>
 
@@ -282,14 +291,20 @@
         <h3>Ministral-3：不是单纯的解析器故障</h3>
         <p>K=8 运行覆盖完整，但没有比较通过有效性、分区与截断率的联合门禁。官方解析器能正确处理完整生成流；AIME 的主要失败发生得更早——模型把预算消耗在 reasoning 中，却没有输出终止性的 final。解析器只是暴露了不完整流，并不是根因。</p>
         <p>MATH500 32K 还出现实质性反转：14B 只有 <strong>7.0%</strong>，8B 为 <strong>31.6%</strong>。因此不能用“修好 parser，大模型就会赢”解释。现有证据同时指向 reasoning-to-final 测量失效和真实的小模型优势；模板、后训练或推理配置的具体责任仍需消融。</p>
+        <p>技术报告让这个反转更容易理解，但还不能完成因果归因。Ministral 3 从 Mistral Small 3.1 出发，按 <strong>14B→8B→3B</strong> 依次剪枝、继续训练和蒸馏；8B 与 14B 并不是从头独立训练的等配方尺度点。报告消融还显示 teacher 选择会显著影响数学能力。因此，级联蒸馏路径和 teacher—student 匹配是非单调尺度结果的合理机制线索，但不是已证实原因。</p>
+        <p>对未收尾问题，报告证据更直接：Reasoning 配方结合 short/long-CoT SFT、GRPO 和 ODPO；作者观察到不可忽略的截断后，把 RL 最大生成长度从 <strong>32K 提高到 80K</strong>。我们的 32K 门禁确实撞上了该配方已知的长推理敏感性，而不是偶然 parser bug。</p>
 
         <h3>Qwen3：运行成功，但“规模”不是干净变量</h3>
         <p>pilot 执行成功，解析也不是限制因素。235B-A22B 在 AIME 上平均准确率更高、total tokens 更少，但 <code>pass@8</code> 略低；MATH500 上，30B-A3B 同时更准（<strong>94.2% 对 89.8%</strong>）且更短（<strong>3.34K 对 4.04K</strong> total tokens）。</p>
         <p>这组比较混合了总参数、MoE 激活参数、路由/架构、后训练和不完整矩阵范围。它支持“结果依赖 benchmark”，却不能干净归因于参数规模。社区比较 MoE 家族时，应分别报告总参数、激活参数、路由和后训练协议。</p>
+        <p>Qwen3 技术报告进一步确认了混杂：30B-A3B 是 <strong>3B 激活、48 层</strong>，235B-A22B 是 <strong>22B 激活、94 层</strong>。更关键的是，轻量 30B 接受 off-policy 与 on-policy 强到弱蒸馏，而旗舰 235B 走完整四阶段 reasoning/general-RL 流程。小模型可能把 teacher 的高价值轨迹压缩成更稳定的策略，但这仍是解释假设。</p>
+        <p>官方推理协议也不同。thinking budget 达到阈值时会插入停止思考并作答的指令，而不是直接硬截断；官方 AIME 评测使用 <strong>38,912</strong> token。我们的硬 32K cap 没有强制 reasoning-to-final，这可能解释一部分 AIME 缺失 final，却解释不了 MATH500 的完整反转。</p>
 
         <h3>GLM-4.5：真实反例叠加推理配置敏感性</h3>
         <p>32K AIME 上，GLM-4.5-Air 的 <code>avg@8</code>（<strong>64.4% 对 55.0%</strong>）和 <code>pass@8</code>（<strong>91.7% 对 83.3%</strong>）都高于完整模型，且大模型截断更多。两者 token 分区有效，因此不能归咎于全局 parser 故障。</p>
         <p>GPQA 的尺度方向相反，同时两个模型 final validity 都低于门禁。AIME 上小模型胜出是真实观察，但跨任务解释受到预算与退出推理行为影响。正确的后续实验是对预算、模板、终止条件和强制收尾做小规模消融，而不是盲目补跑同配置。</p>
+        <p>GLM-4.5 报告显示 Air 与完整模型分别是 <strong>106B/12B 激活</strong>和 <strong>355B/32B 激活</strong>的 MoE。后训练先构建 reasoning、agent 和 chat 专家，再把它们自蒸馏成 thinking/direct-response 混合策略。作者还发现逐步扩展输出长度会造成难以恢复的退化，因此最终直接在 <strong>64K</strong> 输出长度上做 reasoning RL。我们的 32K cap 很可能放大了截断和退出差异。</p>
+        <p>但预算错配不是充分解释。我们已有的仅 seed0 64K 诊断中，AIME24/25 平均严格准确率仍由 Air 领先（<strong>55.0% 对 50.0%</strong>），截断仍约为 <strong>23.3%–30.0%</strong>。这不能替代 K=8，却说明把 cap 翻倍并没有恢复大模型优势；hybrid 蒸馏、激活规模或长推理策略仍可能共同作用。</p>
 
         <h3>一套可复用的诊断顺序</h3>
         <ol>
@@ -322,6 +337,9 @@
           <li><a href="https://www.latent.space/p/noam-brown" target="_blank" rel="noreferrer">Noam Brown，<em>Scaling Test Time Compute to Multi-Agent Civilizations</em></a>，Latent Space，2025 年 6 月 20 日。</li>
           <li><a href="https://www.youtube.com/watch?v=DhD1zZ8w8Mw&amp;t=1209s" target="_blank" rel="noreferrer">Yann Dubois，<em>OpenAI's Yann Dubois: Why AI Progress Suddenly Feels Real</em></a>，The MAD Podcast with Matt Turck，2026 年 5 月 21 日；00:36 为职务介绍，20:09 开始讨论推理效率，22:01 为专家路径类比。</li>
           <li><a href="https://www.youtube.com/watch?v=botHQ7u6-Jk" target="_blank" rel="noreferrer">Josh McGrath，<em>[State of Post-Training] From GPT-4.1 to 5.1: RLVR, Agent &amp; Token Efficiency</em></a>，2025 年 12 月 31 日；token efficiency 章节从 13:12 开始。</li>
+          <li><a href="https://arxiv.org/abs/2601.08584" target="_blank" rel="noreferrer">Liu 等，<em>Ministral 3</em></a>，arXiv:2601.08584，2026。</li>
+          <li><a href="https://arxiv.org/abs/2505.09388" target="_blank" rel="noreferrer">Yang 等，<em>Qwen3 Technical Report</em></a>，arXiv:2505.09388，2025。</li>
+          <li><a href="https://arxiv.org/abs/2508.06471" target="_blank" rel="noreferrer">Zeng 等，<em>GLM-4.5: Agentic, Reasoning, and Coding (ARC) Foundation Models</em></a>，arXiv:2508.06471，2025。</li>
         </ol>
       </div>
     </article>
