@@ -30,14 +30,21 @@
   <main class="single-page">
     <article class="section post">
       <a class="back-link" href="/blog.html" data-en="Back to Blog" data-zh="返回博客">Back to Blog</a>
-      <h1 class="post-title">Post Title</h1>
-      <div class="blog-meta">May 20, 2026 · Category</div>
-      <p>
-        Write the post body here. To publish a new post, copy this file to
-        <code>/posts/YYYY-MM-DD-post-title.html</code>, update the title/date/content,
-        and add a link to the post in <code>/blog.html</code> and the Blog section of
-        <code>/index.html</code>.
-      </p>
+      <div class="section-heading">
+        <h1 class="post-title" data-en="Post Title" data-zh="文章标题">Post Title</h1>
+        <button id="langToggle" class="lang-toggle" type="button" aria-label="Toggle language">
+          <span class="lang-label" data-en="中文" data-zh="EN">中文</span>
+        </button>
+      </div>
+      <div class="blog-meta" data-en="May 20, 2026 · Category" data-zh="2026年5月20日 · 分类">May 20, 2026 · Category</div>
+
+      <div class="post-language" data-lang-content="en">
+        <p>Write the complete English post body here.</p>
+      </div>
+
+      <div class="post-language" data-lang-content="zh" lang="zh-CN" hidden>
+        <p>在这里撰写完整的中文文章。两种语言共享同一组已验证的数据、图表和结论。</p>
+      </div>
     </article>
   </main>
 

@@ -1,5 +1,6 @@
 const toggle = document.getElementById("langToggle");
 const textNodes = document.querySelectorAll("[data-en]");
+const languageContentNodes = document.querySelectorAll("[data-lang-content]");
 let current = "en";
 const navLinks = document.querySelectorAll(".masthead__nav a");
 const pubFilterButtons = document.querySelectorAll(".pub-filter-btn");
@@ -18,6 +19,9 @@ function applyLanguage(lang) {
         node.textContent = value;
       }
     }
+  });
+  languageContentNodes.forEach((node) => {
+    node.hidden = node.getAttribute("data-lang-content") !== lang;
   });
 }
 
