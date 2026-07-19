@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Serif:wght@400;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/assets/style.css?v=20260717" />
+  <link rel="stylesheet" href="/assets/style.css?v=20260719" />
 </head>
 <body>
   <nav class="masthead">
@@ -34,9 +34,9 @@
           <div class="post-kicker" data-en="Controlled reasoning-efficiency study" data-zh="受控推理效率实验">Controlled reasoning-efficiency study</div>
           <h1 class="post-title" data-en="Do Larger Reasoning Models Actually Use Tokens More Efficiently?" data-zh="更大的推理模型，真的更节省 token 吗？">Do Larger Reasoning Models Actually Use Tokens More Efficiently?</h1>
           <p class="post-subtitle"
-             data-en="From an Interview Claim to 97,024 Experimental Rows: An AI-Collaborative Auto Research Practice"
-             data-zh="从一个访谈观点到 97,024 行实验：我的一次 AI 协作式 Auto Research 实践">
-            From an Interview Claim to 97,024 Experimental Rows: An AI-Collaborative Auto Research Practice
+             data-en="Starting from an Interview Claim: A Systematic Test with Open-Weight Reasoning Models"
+             data-zh="从一个访谈观点出发：一次基于开放权重推理模型的系统检验">
+            Starting from an Interview Claim: A Systematic Test with Open-Weight Reasoning Models
           </p>
         </div>
         <button id="langToggle" class="lang-toggle" type="button" aria-label="Toggle language">
@@ -61,6 +61,11 @@
         <blockquote>Within the same model family, under matched tasks, output budgets, decoding rules, and repeated seeds, does a larger model move the quality–reasoning-token frontier outward?</blockquote>
         <p>The design follows directly from that question: compare two sizes inside each family, fix the task and generation protocol, sweep multiple output budgets, repeat each problem, and admit token-efficiency evidence only after final-validity, token-partition, and truncation gates pass.</p>
         <p>GPT-5.5 and GPT-5.6 were research collaborators throughout the project. They helped trace and challenge the hypothesis, design the matrix, audit remote runs, diagnose measurement failures, analyze accepted artifacts, and prepare the report, paper draft, and this article. They are not evidence for the conclusion: every empirical claim below comes from logged jobs and validated result files.</p>
+        <p>The map below compresses the eight decisions that materially changed the study's direction. Orange side branches are research paths diagnosed and downgraded to supplementary or boundary evidence, not simply failed executions.</p>
+        <figure class="research-chart research-process-map">
+          <img src="/assets/research-process-map-en.svg" alt="Vertical Auto-Research map showing eight decisions from an interview claim to a validated conditional conclusion." width="1100" height="1480" loading="lazy">
+          <figcaption><strong>Figure 1.</strong> How the Auto-Research study converged from an interview claim to a validated conclusion. The blue solid line is the adopted research path; orange dashed branches are routes downgraded to boundary evidence after diagnosis, not failed executions by definition.</figcaption>
+        </figure>
 
         <h2>From a broad model screen to two controlled families</h2>
         <p>The project did not begin with two hand-picked winners. The initial candidate pool included GPT-OSS, Qwen3.5 Dense, Ministral-3, Qwen3, and GLM-4.5. We piloted each family, then asked whether it could support an interpretable within-family scale comparison.</p>
@@ -102,11 +107,11 @@
         </div>
         <figure class="research-chart">
           <img src="/assets/reasoning-token-frontier-k8-en.svg" alt="MATH500 at 32K quality versus relative thinking tokens for GPT-OSS and Qwen3.5." width="1100" height="680" loading="lazy">
-          <figcaption><strong>Figure 1.</strong> The Josh McGrath-style two-dimensional view on the cleanest shared slice. Thinking tokens are normalized within each family (smaller model = 100); quality is <code>avg@8</code>. Both GPT-OSS and Qwen3.5 move toward the upper-left. Raw tokens are not compared across families because tokenizers differ.</figcaption>
+          <figcaption><strong>Figure 2.</strong> The Josh McGrath-style two-dimensional view on the cleanest shared slice. Thinking tokens are normalized within each family (smaller model = 100); quality is <code>avg@8</code>. Both GPT-OSS and Qwen3.5 move toward the upper-left. Raw tokens are not compared across families because tokenizers differ.</figcaption>
         </figure>
         <figure class="research-chart">
           <img src="/assets/reasoning-token-frontier-gpqa-k8-en.svg" alt="GPQA-Diamond at 32K quality versus relative thinking tokens for GPT-OSS and Qwen3.5." width="1100" height="680" loading="lazy">
-          <figcaption><strong>Figure 2.</strong> The same plane on GPQA-Diamond. Both larger models move descriptively toward the upper-left, but only GPT-OSS passes every measurement gate. Qwen3.5 is dashed: its strict accuracy remains valid, but its 32K token length is not admissible efficiency evidence.</figcaption>
+          <figcaption><strong>Figure 3.</strong> The same plane on GPQA-Diamond. Both larger models move descriptively toward the upper-left, but only GPT-OSS passes every measurement gate. Qwen3.5 is dashed: its strict accuracy remains valid, but its 32K token length is not admissible efficiency evidence.</figcaption>
         </figure>
 
         <h3>GPT-OSS: the clearest positive result</h3>
@@ -183,6 +188,25 @@
           <li>GPT-OSS high-effort remains an incomplete auxiliary slice.</li>
         </ul>
 
+        <h2>How long the validation took—and how many tokens it processed</h2>
+        <p>I do not treat the calendar span between the beginning and end of the project as working time. Summing the recorded duration of every completed Codex execution turn across the two research tasks—from the first explicit validation request on May 25, 2026, to final primary-matrix acceptance at 11:39 on July 17—gives approximately <strong>126.2 hours of effective Codex work, or five days and six hours</strong>. The earlier phase accounts for about 109.9 hours and the final unified K=8 closeout for about 16.3 hours, across 1,689 completed execution turns.</p>
+        <p>This accounting excludes long idle gaps between Codex turns, so time when I was occupied elsewhere and the project was not advancing is not counted. It does include tool execution, remote-job verification, and polling waits inside an active turn, because those intervals were part of the Codex orchestration workload.</p>
+        <p>The final auditable research archive contains 152,464 inference records: the publication-facing main matrix, the model families retained for failure diagnosis, and the completed GPT-OSS high-effort auxiliary slice. Summing those records gives:</p>
+        <div class="table-wrap">
+          <table class="post-table">
+            <thead><tr><th>Accounting scope</th><th>Tokens</th></tr></thead>
+            <tbody>
+              <tr><td>Model-generated tokens</td><td><strong>837,914,266</strong></td></tr>
+              <tr><td>Thinking tokens</td><td>686,517,778</td></tr>
+              <tr><td>Answer tokens</td><td>150,056,254</td></tr>
+              <tr><td>Other special or unpartitioned tokens</td><td>1,340,234</td></tr>
+              <tr><td>Prompt tokens</td><td>35,964,907</td></tr>
+              <tr><td>Prompt + generation processed</td><td><strong>873,879,173 (about 874 million)</strong></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>The combined output-budget ceiling for these records was about 2.462 billion tokens, so actual generation used approximately <strong>34.0%</strong> of the available ceiling. Even 874 million is only an auditable lower bound on the full research effort: some smoke tests, failed and retried jobs, structurally incorrect runs, and earlier explorations were not consolidated into the final token ledger. These are inference-side model tokens, not the context or API tokens consumed by the GPT-5.5/GPT-5.6 research agents.</p>
+
         <h2>Sources</h2>
         <ol class="source-list">
           <li><a href="https://www.latent.space/p/noam-brown" target="_blank" rel="noreferrer">Noam Brown, <em>Scaling Test Time Compute to Multi-Agent Civilizations</em></a>, Latent Space, June 20, 2025.</li>
@@ -210,6 +234,11 @@
         <blockquote>在同一模型家族内，当任务、输出预算、解码规则和重复种子都保持一致时，增大模型规模是否会把“质量—推理 token”前沿推向更优的位置？</blockquote>
         <p>实验设计直接从这个问题推出：在每个家族内比较两个规模，固定任务和生成协议，扫描多档输出预算，对每道题进行重复采样；只有最终答案有效率、token 分区和截断率都通过预设门禁时，才允许进入 token 效率比较。</p>
         <p>GPT-5.5 和 GPT-5.6 作为研究协作者参与了整个流程：追溯和质疑原始假设、设计实验矩阵、审计远端任务、诊断测量失败、分析验收后的产物，以及协助准备实验报告、论文初稿和这篇文章。它们本身不是结论的证据；下面每个实证数字都来自可复核的任务日志和通过验收的结果文件。</p>
+        <p>下面这张路线图压缩了项目真正改变方向的八个节点。橙色侧枝表示被诊断后降级为补充或边界证据的研究路线，而不是简单的实验执行失败。</p>
+        <figure class="research-chart research-process-map">
+          <img src="/assets/research-process-map-zh.svg" alt="从访谈观点到条件性结论、包含八个主干决策的纵向 Auto Research 研究路线图。" width="1100" height="1480" loading="lazy">
+          <figcaption><strong>图 1。</strong>从访谈观点到可验证结论的 Auto Research 收敛路径。蓝色实线是最终被采纳的研究主干；橙色虚线分支是经过诊断后被降级为边界证据的路线，并不等于实验执行失败。</figcaption>
+        </figure>
 
         <h2>从广泛选型到两个正式实验家族</h2>
         <p>项目并不是从两个“答案正确”的家族开始。最初的候选池包括 GPT-OSS、Qwen3.5 Dense、Ministral-3、Qwen3 和 GLM-4.5。我们先做 pilot，再判断每个家族能否形成可解释的同家族尺度对照。</p>
@@ -251,11 +280,11 @@
         </div>
         <figure class="research-chart">
           <img src="/assets/reasoning-token-frontier-k8-zh.svg" alt="MATH500 32K 下 GPT-OSS 与 Qwen3.5 的质量和相对 thinking tokens 二维图。" width="1100" height="680" loading="lazy">
-          <figcaption><strong>图 1。</strong>把 Josh McGrath 提到的二维评价方式落到最干净的共同切片。thinking tokens 在每个家族内归一化（小模型 = 100），质量为 <code>avg@8</code>。GPT-OSS 与 Qwen3.5 都向左上方移动。由于 tokenizer 不同，图中不跨家族比较原始 token 数。</figcaption>
+          <figcaption><strong>图 2。</strong>把 Josh McGrath 提到的二维评价方式落到最干净的共同切片。thinking tokens 在每个家族内归一化（小模型 = 100），质量为 <code>avg@8</code>。GPT-OSS 与 Qwen3.5 都向左上方移动。由于 tokenizer 不同，图中不跨家族比较原始 token 数。</figcaption>
         </figure>
         <figure class="research-chart">
           <img src="/assets/reasoning-token-frontier-gpqa-k8-zh.svg" alt="GPQA-Diamond 32K 下 GPT-OSS 与 Qwen3.5 的质量和相对 thinking tokens 二维图。" width="1100" height="680" loading="lazy">
-          <figcaption><strong>图 2。</strong>同一张二维图在 GPQA-Diamond 上的结果。两个家族的大模型在描述性结果上都向左上方移动，但只有 GPT-OSS 通过全部测量门禁。Qwen3.5 用虚线标出：其严格准确率仍然有效，但 32K token 长度不能作为可采纳的效率证据。</figcaption>
+          <figcaption><strong>图 3。</strong>同一张二维图在 GPQA-Diamond 上的结果。两个家族的大模型在描述性结果上都向左上方移动，但只有 GPT-OSS 通过全部测量门禁。Qwen3.5 用虚线标出：其严格准确率仍然有效，但 32K token 长度不能作为可采纳的效率证据。</figcaption>
         </figure>
 
         <h3>GPT-OSS：最清晰的正向结果</h3>
@@ -331,6 +360,25 @@
           <li>删失提高了可信度，但减少了 Qwen3.5 的可用比较。</li>
           <li>GPT-OSS high-effort 仍是一个不完整的辅助切片。</li>
         </ul>
+
+        <h2>这次验证花了多久、处理了多少 token</h2>
+        <p>这里不把项目首尾的自然日跨度直接当作工时。按照两个 Codex 任务账本中每个已完成执行回合的实际时长累计——从 2026 年 5 月 25 日首次明确提出验证实验，到 2026 年 7 月 17 日 11:39 最终主矩阵通过验收——Codex 的有效工作时间约为 <strong>126.2 小时，也就是 5 天 6 小时</strong>。其中，前一阶段约 109.9 小时，最后的统一 K=8 收敛阶段约 16.3 小时，共覆盖 1,689 个已完成执行回合。</p>
+        <p>这个口径排除了两次 Codex 执行之间的长空档，因此不会把我处理其他事情、项目无人推进的时间算进去；但会保留活动回合内运行工具、核验远端任务和等待轮询结果的时间，因为这些都属于实验编排实际占用的 Codex 工作时间。</p>
+        <p>最终可审计的研究档案包含 152,464 条推理记录，覆盖面向发表的主矩阵、未通过门禁但保留用于诊断的模型家族，以及已经完成的 GPT-OSS high-effort 辅助切片。逐条汇总得到：</p>
+        <div class="table-wrap">
+          <table class="post-table">
+            <thead><tr><th>统计口径</th><th>Token 数</th></tr></thead>
+            <tbody>
+              <tr><td>模型实际生成 tokens</td><td><strong>837,914,266</strong></td></tr>
+              <tr><td>其中 thinking tokens</td><td>686,517,778</td></tr>
+              <tr><td>其中 answer tokens</td><td>150,056,254</td></tr>
+              <tr><td>其他特殊或未分区 tokens</td><td>1,340,234</td></tr>
+              <tr><td>Prompt tokens</td><td>35,964,907</td></tr>
+              <tr><td>Prompt + 生成总处理量</td><td><strong>873,879,173（约 8.74 亿）</strong></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>这些记录的输出预算上限合计约为 24.62 亿 tokens，实际生成量约占上限的 <strong>34.0%</strong>。不过，8.74 亿仍然只是全流程消耗的可审计下界：部分 smoke、失败与重试任务、错误结构作业和更早期探索没有统一进入最终 token ledger。这里统计的也是评测模型推理端 tokens，不包括 GPT-5.5/GPT-5.6 研究代理自身的上下文或 API token 消耗。</p>
 
         <h2>来源</h2>
         <ol class="source-list">

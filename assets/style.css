@@ -562,6 +562,11 @@ html {
   margin-top: 10px;
 }
 
+.research-process-map {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
 .status-pill {
   background: rgba(107, 100, 88, 0.12);
   border-radius: 999px;
@@ -733,5 +738,9 @@ html {
 
   .post-heading .lang-toggle {
     align-self: flex-start;
+  }
+
+  .research-process-map img {
+    min-width: 700px;
   }
 }

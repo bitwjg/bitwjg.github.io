@@ -1,0 +1,179 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="1480" viewBox="0 0 1100 1480" role="img" aria-labelledby="en-title en-desc">
+  <title id="en-title">From Interview Claim to Validated Conclusion: How an Auto-Research Study Converged</title>
+  <desc id="en-desc">A vertical research map with eight decisions: reformulate an interview intuition as a falsifiable quality versus thinking-token frontier; reduce the full paper blueprint to a minimum experimental loop; require a semantic smoke test rather than mere generation; introduce model-family admission; standardize on K equals 8; add measurement gates and censoring beyond coverage; reuse artifacts and recover only exact missing keys rather than rerun whole batches; and replace a universal claim with a conditional conclusion. Orange dashed branches at model screening are diagnosed or downgraded research paths, not simply failed executions. GPT-OSS and Qwen3.5 Dense follow the blue solid path into the formal matrix.</desc>
+  <defs>
+    <marker id="en-arrow-blue" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L10,5 L0,10 Z" fill="#1f6fc6"/>
+    </marker>
+    <marker id="en-arrow-orange" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L10,5 L0,10 Z" fill="#c65a1f"/>
+    </marker>
+    <style>
+      .bg{fill:#fffdf8}
+      .title{font:600 32px "IBM Plex Sans","Inter","Helvetica Neue",Arial,sans-serif;fill:#201f1a}
+      .subtitle{font:400 19px "IBM Plex Sans","Inter","Helvetica Neue",Arial,sans-serif;fill:#6b6458}
+      .legend{font:500 18px "IBM Plex Sans","Inter","Helvetica Neue",Arial,sans-serif;fill:#514b42}
+      .trunk{fill:none;stroke:#1f6fc6;stroke-width:5;stroke-linecap:round}
+      .connector{fill:none;stroke:#1f6fc6;stroke-width:3;stroke-linecap:round}
+      .node{fill:#eef5fb;stroke:#9fbfe0;stroke-width:2}
+      .node-title{font:600 21px "IBM Plex Sans","Inter","Helvetica Neue",Arial,sans-serif;fill:#201f1a}
+      .node-body{font:400 18px "IBM Plex Sans","Inter","Helvetica Neue",Arial,sans-serif;fill:#514b42}
+      .num{fill:#1f6fc6}
+      .num-text{font:600 21px "IBM Plex Sans","Inter","Helvetica Neue",Arial,sans-serif;fill:#fffdf8;text-anchor:middle}
+      .gate-label{font:600 15px "IBM Plex Sans","Inter","Helvetica Neue",Arial,sans-serif;fill:#1f6fc6;letter-spacing:1px}
+      .diag-line{fill:none;stroke:#c65a1f;stroke-width:2.5;stroke-dasharray:8 7}
+      .diag{fill:#fff2e8;stroke:#e8b28f;stroke-width:1.8}
+      .diag-title{font:600 18px "IBM Plex Sans","Inter","Helvetica Neue",Arial,sans-serif;fill:#201f1a}
+      .diag-body{font:400 15px "IBM Plex Sans","Inter","Helvetica Neue",Arial,sans-serif;fill:#6b4a36}
+      .admit{fill:#eaf3fc;stroke:#1f6fc6;stroke-width:2.5}
+      .admit-title{font:600 22px "IBM Plex Sans","Inter","Helvetica Neue",Arial,sans-serif;fill:#201f1a}
+      .admit-body{font:400 18px "IBM Plex Sans","Inter","Helvetica Neue",Arial,sans-serif;fill:#514b42}
+      .foot{font:400 16px "IBM Plex Sans","Inter","Helvetica Neue",Arial,sans-serif;fill:#6b6458}
+    </style>
+  </defs>
+
+  <rect class="bg" width="1100" height="1480"/>
+  <text class="title" x="550" y="53" text-anchor="middle">From Interview Claim to Validated Conclusion</text>
+  <text class="subtitle" x="550" y="87" text-anchor="middle">How an Auto-Research Study Converged</text>
+  <text class="subtitle" x="550" y="119" text-anchor="middle">Blue solid line = adopted research path　Orange dashed line = diagnosed boundary evidence</text>
+  <g aria-label="Legend">
+    <line x1="325" y1="148" x2="380" y2="148" class="trunk"/>
+    <text class="legend" x="393" y="154">main decisions</text>
+    <line x1="588" y1="148" x2="643" y2="148" class="diag-line"/>
+    <text class="legend" x="656" y="154">diagnostic branches</text>
+  </g>
+
+  <path class="trunk" d="M550 178 L550 1432" marker-end="url(#en-arrow-blue)"/>
+
+  <g role="list" aria-label="Eight main research decisions">
+    <g role="listitem" aria-label="Decision one: from interview intuition to a falsifiable frontier">
+      <path class="connector" d="M505 233 L550 233"/>
+      <rect class="node" x="55" y="180" width="450" height="106" rx="18"/>
+      <circle class="num" cx="89" cy="210" r="20"/><text class="num-text" x="89" y="217">1</text>
+      <text class="node-title" x="120" y="218">Interview intuition → testable frontier</text>
+      <text class="node-body" x="82" y="250">
+        <tspan x="82">Replace mean-token comparisons with a within-family,</tspan>
+        <tspan x="82" dy="25">iso-quality “quality–thinking-token” frontier.</tspan>
+      </text>
+    </g>
+
+    <g role="listitem" aria-label="Decision two: from a full paper blueprint to a minimum experimental loop">
+      <path class="connector" d="M550 363 L595 363"/>
+      <rect class="node" x="595" y="306" width="450" height="114" rx="18"/>
+      <circle class="num" cx="629" cy="336" r="20"/><text class="num-text" x="629" y="343">2</text>
+      <text class="node-title" x="660" y="344">Full blueprint → minimum closed loop</text>
+      <text class="node-body" x="622" y="377">
+        <tspan x="622">Defer FLOPs, latency, and mechanism tests;</tspan>
+        <tspan x="622" dy="25">test the scale-versus-visible-token claim first.</tspan>
+      </text>
+    </g>
+
+    <g role="listitem" aria-label="Decision three: from can generate to passing semantic smoke">
+      <path class="connector" d="M505 500 L550 500"/>
+      <rect class="node" x="55" y="442" width="450" height="124" rx="18"/>
+      <circle class="num" cx="89" cy="472" r="20"/><text class="num-text" x="89" y="479">3</text>
+      <text class="node-title" x="120" y="480">Generation → semantic smoke</text>
+      <text class="node-body" x="82" y="514">
+        <tspan x="82">Use official chat templates, Harmony, and reasoning</tspan>
+        <tspan x="82" dy="25">parsers; validate finals and token partitions.</tspan>
+      </text>
+    </g>
+
+    <g role="listitem" aria-label="Decision four: from broad candidates to model-family admission">
+      <path class="connector" d="M550 646 L595 646"/>
+      <rect class="node" x="595" y="582" width="450" height="128" rx="18"/>
+      <circle class="num" cx="629" cy="612" r="20"/><text class="num-text" x="629" y="619">4</text>
+      <text class="gate-label" x="1018" y="607" text-anchor="end">ADMISSION GATE</text>
+      <text class="node-title" x="660" y="641">Broad candidates → admission gate</text>
+      <text class="node-body" x="622" y="666">
+        <tspan x="622">Screen for comparability and a scale ladder,</tspan>
+        <tspan x="622" dy="21">measurement validity, and recipe interpretability—</tspan>
+        <tspan x="622" dy="21">not the outcome.</tspan>
+      </text>
+    </g>
+
+    <g role="listitem" aria-label="Decision five: standardize mixed and single sampling on K equals 8">
+      <path class="connector" d="M505 946 L550 946"/>
+      <rect class="node" x="55" y="890" width="450" height="112" rx="18"/>
+      <circle class="num" cx="89" cy="920" r="20"/><text class="num-text" x="89" y="927">5</text>
+      <text class="node-title" x="120" y="929">Mixed sampling → unified K=8</text>
+      <text class="node-body" x="82" y="963">
+        <tspan x="82">Four tasks, four caps, eight rollouts; report both</tspan>
+        <tspan x="82" dy="25">avg@8 and pass@8.</tspan>
+      </text>
+    </g>
+
+    <g role="listitem" aria-label="Decision six: from coverage complete to measurement gates and censoring">
+      <path class="connector" d="M550 1081 L595 1081"/>
+      <rect class="node" x="595" y="1019" width="450" height="124" rx="18"/>
+      <circle class="num" cx="629" cy="1049" r="20"/><text class="num-text" x="629" y="1056">6</text>
+      <text class="node-title" x="660" y="1058">Coverage → gates and censoring</text>
+      <text class="node-body" x="622" y="1085">
+        <tspan x="622">Add final-validity and token-partition gates,</tspan>
+        <tspan x="622" dy="21">plus the 32K truncation gate. Keep strict accuracy;</tspan>
+        <tspan x="622" dy="21">censor token-efficiency claims.</tspan>
+      </text>
+    </g>
+
+    <g role="listitem" aria-label="Decision seven: from whole-batch reruns to artifact reuse and exact recovery">
+      <path class="connector" d="M505 1225 L550 1225"/>
+      <rect class="node" x="55" y="1161" width="450" height="128" rx="18"/>
+      <circle class="num" cx="89" cy="1191" r="20"/><text class="num-text" x="89" y="1198">7</text>
+      <text class="node-title" x="120" y="1200">Full rerun → exact recovery</text>
+      <text class="node-body" x="82" y="1228">
+        <tspan x="82">Reuse artifacts and fill composite-key gaps.</tspan>
+        <tspan x="82" dy="21">Recover 671/700 Qwen 27B rows from logs;</tspan>
+        <tspan x="82" dy="21">rerun true gaps after an explicit-seed preflight.</tspan>
+      </text>
+    </g>
+
+    <g role="listitem" aria-label="Decision eight: from a universal law to a conditional conclusion">
+      <path class="connector" d="M550 1370 L595 1370"/>
+      <rect class="node" x="595" y="1308" width="450" height="124" rx="18"/>
+      <circle class="num" cx="629" cy="1338" r="20"/><text class="num-text" x="629" y="1345">8</text>
+      <text class="node-title" x="660" y="1347">Universal claim → conditional result</text>
+      <text class="node-body" x="622" y="1378">
+        <tspan x="622">GPT-OSS and Qwen3.5 enter</tspan>
+        <tspan x="622" dy="21">the main evidence; other families define</tspan>
+        <tspan x="622" dy="21">failure modes and boundaries.</tspan>
+      </text>
+    </g>
+  </g>
+
+  <g aria-label="Model-family screening branches">
+    <path class="diag-line" d="M595 680 C545 700 525 728 510 757"/>
+    <path class="diag-line" d="M510 757 L285 757"/>
+    <path class="diag-line" d="M510 757 L545 757"/>
+    <path class="diag-line" d="M510 757 L285 832"/>
+    <path class="diag-line" d="M510 757 L545 832"/>
+    <path class="connector" d="M820 710 L820 748" marker-end="url(#en-arrow-blue)"/>
+
+    <g aria-label="OLMo and Seed-OSS diagnosed as unstable finalization or lacking comparable scale">
+      <rect class="diag" x="35" y="724" width="245" height="66" rx="14"/>
+      <text class="diag-title" x="53" y="750">OLMo / Seed-OSS</text>
+      <text class="diag-body" x="53" y="774">unstable finals / no scale pair</text>
+    </g>
+    <g aria-label="Qwen3 diagnosed as confounded by mixture of experts, distillation, and post-training">
+      <rect class="diag" x="300" y="724" width="245" height="66" rx="14"/>
+      <text class="diag-title" x="318" y="750">Qwen3</text>
+      <text class="diag-body" x="318" y="774">MoE + distillation + post-training</text>
+    </g>
+    <g aria-label="Ministral-3 diagnosed as reasoning-to-final failure and a genuine quality reversal">
+      <rect class="diag" x="35" y="800" width="245" height="66" rx="14"/>
+      <text class="diag-title" x="53" y="826">Ministral-3</text>
+      <text class="diag-body" x="53" y="850">finalization failure + reversal</text>
+    </g>
+    <g aria-label="GLM-4.5 diagnosed as a genuine counterexample and budget sensitivity">
+      <rect class="diag" x="300" y="800" width="245" height="66" rx="14"/>
+      <text class="diag-title" x="318" y="826">GLM-4.5</text>
+      <text class="diag-body" x="318" y="850">counterexample + cap sensitivity</text>
+    </g>
+    <g aria-label="GPT-OSS and Qwen3.5 Dense enter the formal main matrix">
+      <rect class="admit" x="595" y="748" width="450" height="90" rx="16"/>
+      <text class="admit-title" x="820" y="783" text-anchor="middle">GPT-OSS + Qwen3.5 Dense</text>
+      <text class="admit-body" x="820" y="814" text-anchor="middle">admitted → formal main matrix</text>
+    </g>
+  </g>
+
+  <text class="foot" x="55" y="1462">Note: orange branches are diagnosed or downgraded paths, not simply failed executions.</text>
+</svg>

@@ -1,0 +1,176 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="1480" viewBox="0 0 1100 1480" role="img" aria-labelledby="zh-title zh-desc">
+  <title id="zh-title">从访谈观点到可验证结论：一次 Auto Research 如何收敛</title>
+  <desc id="zh-desc">一张纵向研究路线图。八个主干决策依次是：把访谈直觉改写为可证伪的质量—thinking token 前沿；把完整论文蓝图缩减为最小实验闭环；以语义 smoke 取代仅能生成；建立模型准入制；统一为 K 等于 8；从覆盖完整升级到测量门禁与删失；从整批重跑转为产物复用与精确恢复；最终把普遍规律收敛为条件性结论。模型筛选节点的橙色虚线分支表示被诊断或降级为边界证据的路线，不等于实验执行失败；GPT-OSS 与 Qwen3.5 Dense 通过蓝色实线汇入正式主矩阵。</desc>
+  <defs>
+    <marker id="zh-arrow-blue" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L10,5 L0,10 Z" fill="#1f6fc6"/>
+    </marker>
+    <marker id="zh-arrow-orange" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L10,5 L0,10 Z" fill="#c65a1f"/>
+    </marker>
+    <style>
+      .bg{fill:#fffdf8}
+      .title{font:600 36px "IBM Plex Sans","PingFang SC","Noto Sans CJK SC","Microsoft YaHei",sans-serif;fill:#201f1a}
+      .subtitle{font:400 20px "IBM Plex Sans","PingFang SC","Noto Sans CJK SC","Microsoft YaHei",sans-serif;fill:#6b6458}
+      .legend{font:500 18px "IBM Plex Sans","PingFang SC","Noto Sans CJK SC","Microsoft YaHei",sans-serif;fill:#514b42}
+      .trunk{fill:none;stroke:#1f6fc6;stroke-width:5;stroke-linecap:round}
+      .connector{fill:none;stroke:#1f6fc6;stroke-width:3;stroke-linecap:round}
+      .node{fill:#eef5fb;stroke:#9fbfe0;stroke-width:2}
+      .node-title{font:600 25px "IBM Plex Sans","PingFang SC","Noto Sans CJK SC","Microsoft YaHei",sans-serif;fill:#201f1a}
+      .node-body{font:400 20px "IBM Plex Sans","PingFang SC","Noto Sans CJK SC","Microsoft YaHei",sans-serif;fill:#514b42}
+      .num{fill:#1f6fc6}
+      .num-text{font:600 21px "IBM Plex Sans","PingFang SC","Noto Sans CJK SC","Microsoft YaHei",sans-serif;fill:#fffdf8;text-anchor:middle}
+      .gate-label{font:600 17px "IBM Plex Sans","PingFang SC","Noto Sans CJK SC","Microsoft YaHei",sans-serif;fill:#1f6fc6;letter-spacing:1px}
+      .diag-line{fill:none;stroke:#c65a1f;stroke-width:2.5;stroke-dasharray:8 7}
+      .diag{fill:#fff2e8;stroke:#e8b28f;stroke-width:1.8}
+      .diag-title{font:600 19px "IBM Plex Sans","PingFang SC","Noto Sans CJK SC","Microsoft YaHei",sans-serif;fill:#201f1a}
+      .diag-body{font:400 17px "IBM Plex Sans","PingFang SC","Noto Sans CJK SC","Microsoft YaHei",sans-serif;fill:#6b4a36}
+      .admit{fill:#eaf3fc;stroke:#1f6fc6;stroke-width:2.5}
+      .admit-title{font:600 23px "IBM Plex Sans","PingFang SC","Noto Sans CJK SC","Microsoft YaHei",sans-serif;fill:#201f1a}
+      .admit-body{font:400 19px "IBM Plex Sans","PingFang SC","Noto Sans CJK SC","Microsoft YaHei",sans-serif;fill:#514b42}
+      .foot{font:400 17px "IBM Plex Sans","PingFang SC","Noto Sans CJK SC","Microsoft YaHei",sans-serif;fill:#6b6458}
+    </style>
+  </defs>
+
+  <rect class="bg" width="1100" height="1480"/>
+  <text class="title" x="550" y="55" text-anchor="middle">从访谈观点到可验证结论：一次 Auto Research 如何收敛</text>
+  <text class="subtitle" x="550" y="92" text-anchor="middle">蓝色实线＝被采纳的研究主干　橙色虚线＝诊断后降级为边界证据的路线</text>
+  <g aria-label="图例">
+    <line x1="320" y1="126" x2="375" y2="126" class="trunk"/>
+    <text class="legend" x="388" y="132">主干决策</text>
+    <line x1="565" y1="126" x2="620" y2="126" class="diag-line"/>
+    <text class="legend" x="633" y="132">诊断分支</text>
+  </g>
+
+  <path class="trunk" d="M550 160 L550 1432" marker-end="url(#zh-arrow-blue)"/>
+
+  <g role="list" aria-label="八个主干决策">
+    <g role="listitem" aria-label="节点一：访谈直觉转化为可证伪前沿">
+      <path class="connector" d="M505 225 L550 225"/>
+      <rect class="node" x="55" y="168" width="450" height="114" rx="18"/>
+      <circle class="num" cx="89" cy="198" r="20"/><text class="num-text" x="89" y="205">1</text>
+      <text class="node-title" x="120" y="207">访谈直觉 → 可证伪前沿</text>
+      <text class="node-body" x="82" y="244">
+        <tspan x="82">从比较平均 token，转向家族内等质量的</tspan>
+        <tspan x="82" dy="28">“质量—thinking token”前沿。</tspan>
+      </text>
+    </g>
+
+    <g role="listitem" aria-label="节点二：完整论文蓝图缩减为最小实验闭环">
+      <path class="connector" d="M550 363 L595 363"/>
+      <rect class="node" x="595" y="306" width="450" height="114" rx="18"/>
+      <circle class="num" cx="629" cy="336" r="20"/><text class="num-text" x="629" y="343">2</text>
+      <text class="node-title" x="660" y="345">完整论文蓝图 → 最小实验闭环</text>
+      <text class="node-body" x="622" y="382">
+        <tspan x="622">暂缓 FLOPs、延迟与更广泛的机制实验，</tspan>
+        <tspan x="622" dy="28">先验证规模—显式 token 的核心命题。</tspan>
+      </text>
+    </g>
+
+    <g role="listitem" aria-label="节点三：从能生成升级到语义 smoke 通过">
+      <path class="connector" d="M505 500 L550 500"/>
+      <rect class="node" x="55" y="442" width="450" height="124" rx="18"/>
+      <circle class="num" cx="89" cy="472" r="20"/><text class="num-text" x="89" y="479">3</text>
+      <text class="node-title" x="120" y="481">能生成 → 语义 smoke 通过</text>
+      <text class="node-body" x="82" y="518">
+        <tspan x="82">切换到官方 chat template、Harmony 与</tspan>
+        <tspan x="82" dy="27">reasoning parser，并验证 final 与 token 分区。</tspan>
+      </text>
+    </g>
+
+    <g role="listitem" aria-label="节点四：从广泛模型候选转为模型准入制">
+      <path class="connector" d="M550 646 L595 646"/>
+      <rect class="node" x="595" y="582" width="450" height="128" rx="18"/>
+      <circle class="num" cx="629" cy="612" r="20"/><text class="num-text" x="629" y="619">4</text>
+      <text class="gate-label" x="1018" y="607" text-anchor="end">模型准入门</text>
+      <text class="node-title" x="660" y="643">广泛候选 → 模型准入制</text>
+      <text class="node-body" x="622" y="674">
+        <tspan x="622">按可比性、尺度梯度、测量有效性与</tspan>
+        <tspan x="622" dy="25">配方可解释性筛选，而不是按结论筛选。</tspan>
+      </text>
+    </g>
+
+    <g role="listitem" aria-label="节点五：统一为 K 等于 8 的重复采样协议">
+      <path class="connector" d="M505 946 L550 946"/>
+      <rect class="node" x="55" y="890" width="450" height="112" rx="18"/>
+      <circle class="num" cx="89" cy="920" r="20"/><text class="num-text" x="89" y="927">5</text>
+      <text class="node-title" x="120" y="929">单次与混合采样 → 统一 K=8</text>
+      <text class="node-body" x="82" y="966">
+        <tspan x="82">四个任务、四档预算、八次 rollout，</tspan>
+        <tspan x="82" dy="27">同时报告 avg@8 与 pass@8。</tspan>
+      </text>
+    </g>
+
+    <g role="listitem" aria-label="节点六：从覆盖完整升级到测量门禁与删失">
+      <path class="connector" d="M550 1081 L595 1081"/>
+      <rect class="node" x="595" y="1019" width="450" height="124" rx="18"/>
+      <circle class="num" cx="629" cy="1049" r="20"/><text class="num-text" x="629" y="1056">6</text>
+      <text class="node-title" x="660" y="1058">覆盖完整 → 测量门禁与删失</text>
+      <text class="node-body" x="622" y="1087">
+        <tspan x="622">门禁：final validity、token partition、</tspan>
+        <tspan x="622" dy="23">32K 截断；保留严格准确率，</tspan>
+        <tspan x="622" dy="23">删失 token efficiency。</tspan>
+      </text>
+    </g>
+
+    <g role="listitem" aria-label="节点七：从整批重跑转向产物复用与精确恢复">
+      <path class="connector" d="M505 1225 L550 1225"/>
+      <rect class="node" x="55" y="1161" width="450" height="128" rx="18"/>
+      <circle class="num" cx="89" cy="1191" r="20"/><text class="num-text" x="89" y="1198">7</text>
+      <text class="node-title" x="120" y="1199">整批重跑 → 精确恢复</text>
+      <text class="node-body" x="82" y="1228">
+        <tspan x="82">复用产物，按复合键补缺；</tspan>
+        <tspan x="82" dy="23">Qwen 27B 从日志恢复 671/700，</tspan>
+        <tspan x="82" dy="23">只续跑真实缺口，并用显式 seed 预检。</tspan>
+      </text>
+    </g>
+
+    <g role="listitem" aria-label="节点八：从普遍规律收敛为条件性结论">
+      <path class="connector" d="M550 1370 L595 1370"/>
+      <rect class="node" x="595" y="1308" width="450" height="124" rx="18"/>
+      <circle class="num" cx="629" cy="1338" r="20"/><text class="num-text" x="629" y="1345">8</text>
+      <text class="node-title" x="660" y="1347">普遍规律 → 条件性结论</text>
+      <text class="node-body" x="622" y="1383">
+        <tspan x="622">GPT-OSS 与 Qwen3.5 进入主证据；</tspan>
+        <tspan x="622" dy="24">其余家族成为失败模式与适用边界。</tspan>
+      </text>
+    </g>
+  </g>
+
+  <g aria-label="模型筛选分支">
+    <path class="diag-line" d="M595 680 C545 700 525 728 510 757"/>
+    <path class="diag-line" d="M510 757 L285 757"/>
+    <path class="diag-line" d="M510 757 L545 757"/>
+    <path class="diag-line" d="M510 757 L285 832"/>
+    <path class="diag-line" d="M510 757 L545 832"/>
+    <path class="connector" d="M820 710 L820 748" marker-end="url(#zh-arrow-blue)"/>
+
+    <g aria-label="OLMo 和 Seed-OSS 被诊断为收尾不稳定或缺少可比尺度">
+      <rect class="diag" x="35" y="724" width="245" height="66" rx="14"/>
+      <text class="diag-title" x="53" y="751">OLMo / Seed-OSS</text>
+      <text class="diag-body" x="53" y="775">收尾不稳／缺少可比尺度</text>
+    </g>
+    <g aria-label="Qwen3 被诊断为 MoE 蒸馏和后训练配方混杂">
+      <rect class="diag" x="300" y="724" width="245" height="66" rx="14"/>
+      <text class="diag-title" x="318" y="751">Qwen3</text>
+      <text class="diag-body" x="318" y="775">MoE、蒸馏与后训练混杂</text>
+    </g>
+    <g aria-label="Ministral-3 被诊断为推理收尾失效与真实质量反转">
+      <rect class="diag" x="35" y="800" width="245" height="66" rx="14"/>
+      <text class="diag-title" x="53" y="827">Ministral-3</text>
+      <text class="diag-body" x="53" y="851">收尾失效＋真实质量反转</text>
+    </g>
+    <g aria-label="GLM-4.5 被诊断为真实反例和预算敏感性">
+      <rect class="diag" x="300" y="800" width="245" height="66" rx="14"/>
+      <text class="diag-title" x="318" y="827">GLM-4.5</text>
+      <text class="diag-body" x="318" y="851">真实反例＋预算敏感性</text>
+    </g>
+    <g aria-label="GPT-OSS 与 Qwen3.5 Dense 进入正式主矩阵">
+      <rect class="admit" x="595" y="748" width="450" height="90" rx="16"/>
+      <text class="admit-title" x="820" y="783" text-anchor="middle">GPT-OSS ＋ Qwen3.5 Dense</text>
+      <text class="admit-body" x="820" y="815" text-anchor="middle">通过准入门 → 汇入正式主矩阵</text>
+    </g>
+  </g>
+
+  <text class="foot" x="55" y="1462">注：橙色侧枝表示路线被诊断或降级为边界证据，不等于实验执行失败。</text>
+</svg>
