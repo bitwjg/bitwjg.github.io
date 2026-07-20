@@ -567,6 +567,11 @@ html {
   -webkit-overflow-scrolling: touch;
 }
 
+.research-chart--dense {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
 .status-pill {
   background: rgba(107, 100, 88, 0.12);
   border-radius: 999px;
@@ -741,6 +746,10 @@ html {
   }
 
   .research-process-map img {
+    min-width: 700px;
+  }
+
+  .research-chart--dense img {
     min-width: 700px;
   }
 }

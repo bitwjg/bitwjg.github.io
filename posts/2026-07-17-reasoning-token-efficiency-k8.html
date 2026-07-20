@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Serif:wght@400;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/assets/style.css?v=20260719" />
+  <link rel="stylesheet" href="/assets/style.css?v=20260720" />
 </head>
 <body>
   <nav class="masthead">
@@ -48,24 +48,26 @@
       <div class="post-language" data-lang-content="en">
         <h2>The project began with a Yann Dubois interview</h2>
         <p>This project did not begin with a benchmark table. It began with Yann Dubois's interview on <em>The MAD Podcast with Matt Turck</em>. Dubois, who co-leads OpenAI's post-training frontiers team, made a direct connection between pretrained model scale and reasoning-token efficiency:</p>
-        <blockquote>“One thing that I do want to highlight when we're talking, for example, with efficiency: if you have larger models, the amount of thinking time—so the amount of tokens they will think for—will usually decrease. And the way that you can think about it is that, metaphorically, the model already thinks through its weights when it generates a certain token. So you can decrease the number of, like, tokens that you need to generate for thinking by kind of, like, increasing the size of the model that you are training. So oftentimes, if you just increase the model size—if you basically pre-train larger models—you will get better efficiency.”<br><span class="quote-source">—Yann Dubois, <a href="https://www.youtube.com/watch?v=DhD1zZ8w8Mw&amp;t=1474s" target="_blank" rel="noreferrer">24:34–25:23 in the original interview</a>. Lightly punctuated from the video's English auto-generated captions; verbal fillers such as <em>um</em> and <em>uh</em> omitted.</span></blockquote>
-        <p>This was the passage that gave me the idea for the study. It directly connects three claims: a larger pretrained model, more “thinking” already performed through its weights, and fewer explicit thinking tokens. The mechanism feels intuitive—if more capability is internalized in the parameters, inference may not need to reconstruct the same search through an equally long visible trace.</p>
+        <blockquote>“If you have larger models, the amount of thinking time—so the amount of tokens they will think for—will usually decrease. […] The model already thinks through its weights when it generates a certain token. So you can decrease the number of tokens that you need to generate for thinking by increasing the size of the model […] if you basically pre-train larger models, you will get better efficiency.”<br><span class="quote-source">—Yann Dubois, <a href="https://www.youtube.com/watch?v=DhD1zZ8w8Mw&amp;t=1474s" target="_blank" rel="noreferrer">excerpt from 24:34–25:23 in the original interview</a>.</span></blockquote>
+        <p>This passage directly motivated the study. It connects three claims: a larger pretrained model, more “thinking” already performed through its weights, and fewer explicit thinking tokens. The mechanism feels intuitive—if more capability is internalized in the parameters, inference may not need to reconstruct the same search through an equally long visible trace.</p>
         <p>But intuition is not evidence. This is an interview statement, not an official OpenAI technical report; and “usually decrease” is not a universal claim across every family, task, or budget. A test also cannot simply compare leaderboard scores or treat any shorter output as more efficient: the model may have truncated early or failed to emit a final answer. The controlled question is:</p>
         <blockquote>Within the same model family, under matched tasks, output budgets, decoding rules, and repeated-sampling protocols, can the larger model reach equal or better quality with fewer visible thinking tokens?</blockquote>
-        <p>At the same time, I had been exploring Auto Research: whether frontier models could help formulate hypotheses, design experiments, orchestrate remote runs, audit artifacts, diagnose failures, and converge the evidence into a reproducible report. Yann's claim became a concrete target for that Auto-Research practice.</p>
+        <p>I was also exploring Auto Research: whether frontier models could help formulate hypotheses, design experiments, orchestrate remote runs, audit artifacts, diagnose failures, and converge the evidence into a reproducible report. I therefore turned Yann's claim into a concrete research question.</p>
         <p>Public discussions by Noam Brown and Josh McGrath then supplied two missing pieces. Brown stressed that additional test-time compute becomes useful only when the model is capable enough to exploit it. McGrath proposed judging progress on a two-dimensional quality–token plane, where the valuable movement is up and to the left. Together, the three perspectives define the study: Yann supplies the scale–weights efficiency mechanism, Brown the capability precondition, and McGrath the measurement coordinates.</p>
-        <p>The design follows from that framing: compare two sizes inside each family, fix the task and generation protocol, sweep multiple output budgets, repeat each problem, and admit token-efficiency evidence only after final-validity, token-partition, and truncation gates pass.</p>
-        <p>GPT-5.5 and GPT-5.6 were research collaborators throughout the project. They helped trace and challenge the hypothesis, design the matrix, audit remote runs, diagnose measurement failures, analyze accepted artifacts, and prepare the report, paper draft, and this article. They are not evidence for the conclusion: every empirical claim below comes from logged jobs and validated result files.</p>
-        <p>The map below compresses the eight decisions that materially changed the study's direction. Orange side branches are research paths diagnosed and downgraded to supplementary or boundary evidence, not simply failed executions.</p>
+        <p>The experimental design follows from that framing: compare two sizes within each family, keep the task and generation protocol fixed, sweep multiple output budgets, repeat each problem, and admit token-efficiency evidence only when final-answer validity, token partitioning, and truncation pass predefined gates.</p>
+        <p>GPT-5.5 and GPT-5.6 were research collaborators throughout the process. They helped trace and challenge the hypothesis, design the experimental matrix, audit remote runs, diagnose measurement failures, analyze accepted artifacts, and prepare the report, paper draft, and this article. They are not evidence for the conclusion: the empirical claims in this article come from logged jobs and validated result files.</p>
+        <p>Figure 1 summarizes eight decisions that materially changed the study's direction. Orange side branches are research paths diagnosed and downgraded to supplementary or boundary evidence, not simply failed executions.</p>
         <figure class="research-chart research-process-map">
           <img src="/assets/research-process-map-en.svg" alt="Vertical Auto-Research map showing eight decisions from an interview claim to a validated conditional conclusion." width="1100" height="1480" loading="lazy">
           <figcaption><strong>Figure 1.</strong> How the Auto-Research study converged from an interview claim to a validated conclusion. The blue solid line is the adopted research path; orange dashed branches are routes downgraded to boundary evidence after diagnosis, not failed executions by definition.</figcaption>
         </figure>
 
         <h2>From a broad model screen to two controlled families</h2>
-        <p>The project did not begin with two hand-picked winners. The initial candidate pool included GPT-OSS, Qwen3.5 Dense, Ministral-3, Qwen3, and GLM-4.5. We piloted each family, then asked whether it could support an interpretable within-family scale comparison.</p>
+        <p>The project did not begin with GPT-OSS and Qwen3.5 as two hand-picked “winners.” The initial candidate pool also included Ministral-3, Qwen3, and GLM-4.5. We ran pilots first, then asked whether each family could support an interpretable within-family scale comparison.</p>
         <div class="method-note"><strong>Admission contract.</strong> A family needed two meaningfully comparable sizes; matched tokenizer, template, parser, and generation protocol; enough task, budget, and repeated-sampling coverage; and final-validity, token-partition, and truncation quality sufficient for trustworthy token measurement.</div>
-        <p>GPT-OSS and Qwen3.5 Dense survived that screen. Ministral-3, Qwen3, and GLM-4.5 were not removed because their results were inconvenient: they exposed measurement failure, architecture confounding, genuine scale reversal, and inference-budget interaction. The evidence scope was frozen by <strong>comparability and measurement validity</strong>, not by which family confirmed the hypothesis.</p>
+        <p>GPT-OSS had one additional study-design advantage. OpenAI's <a href="https://cdn.openai.com/pdf/419b6906-9da6-406c-a19d-1bb078ac7637/oai_gpt-oss_model_card.pdf" target="_blank" rel="noreferrer">official model card</a> already supplied a 20B/120B within-family scale pair, the official Harmony format, and multi-effort evaluations on AIME and GPQA-Diamond. Figure 3 in particular places low, medium, and high reasoning effort on an accuracy-versus-average-<code>CoT+Answer</code> plane, where 120B often reaches a comparable or higher-quality region with shorter output. Those results are not part of our experiment and are not counted below, but they made GPT-OSS unusually well suited to a controlled follow-up: comparable scale points, reliable token channels, and a pre-existing quality–token prior.</p>
+        <p>GPT-OSS and Qwen3.5 Dense survived that screen and formed the cleanest controlled comparisons. Ministral-3, Qwen3, and GLM-4.5 were not removed because their results were inconvenient. They exposed different combinations of measurement failure, architectural confounding, real scale reversal, and inference-budget interaction, and are analyzed separately as failure modes and boundary evidence.</p>
+        <p>The final evidence scope was frozen by <strong>comparability and measurement validity</strong>, not by whether a family confirmed the hypothesis. Families outside the main matrix remain part of the result.</p>
 
         <h2>Experimental setup</h2>
         <div class="table-wrap">
@@ -77,7 +79,7 @@
             </tbody>
           </table>
         </div>
-        <p>This is where the <strong>K=8</strong> protocol enters. The main experiment compares <strong>four models</strong> across <strong>four tasks</strong>—MATH500, GPQA-Diamond, AIME 2024, and AIME 2025—and <strong>four maximum output budgets</strong> of 4K, 8K, 16K, and 32K. Every model–problem–budget cell contains <strong>eight independent rollouts</strong>.</p>
+        <p>The experiment uses a unified <strong>K=8</strong> protocol. It compares <strong>four models</strong> across <strong>four tasks</strong>—MATH500, GPQA-Diamond, AIME 2024, and AIME 2025—and <strong>four maximum output budgets</strong> of 4K, 8K, 16K, and 32K. Every model–problem–budget cell contains <strong>eight independent rollouts</strong>.</p>
         <div class="metric-strip" aria-label="Experiment scale">
           <div><strong>4</strong><span>models</span></div>
           <div><strong>4</strong><span>tasks</span></div>
@@ -85,7 +87,7 @@
           <div><strong>8</strong><span>rollouts</span></div>
         </div>
         <p>GPT-OSS high-effort is treated only as an auxiliary analysis and does not gate the primary conclusion; the other candidate families are retained in the failure diagnostics below.</p>
-        <p>Quality is measured primarily by average accuracy over eight rollouts (<code>avg@8</code>), with <code>pass@8</code> as an auxiliary measure. We count thinking, answer, and total generated tokens separately.</p>
+        <p>Quality is measured primarily by average accuracy over eight rollouts (<code>avg@8</code>). <code>pass@8</code> is auxiliary. We separately count thinking tokens, answer tokens, and total generated tokens.</p>
         <div class="method-note"><strong>Measurement gate.</strong> Strict accuracy always counts a missing or unparsable final answer as wrong. A token-efficiency comparison is admitted only when final validity and thinking/answer partition validity are both at least 95%. A 32K cell must also truncate no more than 5% of the time. Failed cells retain strict accuracy but are censored from token-efficiency claims.</div>
 
         <h2>What the final aggregate says</h2>
@@ -99,14 +101,16 @@
             </tbody>
           </table>
         </div>
-        <figure class="research-chart">
-          <img src="/assets/reasoning-token-frontier-k8-en.svg" alt="MATH500 at 32K quality versus relative thinking tokens for GPT-OSS and Qwen3.5." width="1100" height="680" loading="lazy">
-          <figcaption><strong>Figure 2.</strong> The Josh McGrath-style two-dimensional view on the cleanest shared slice. Thinking tokens are normalized within each family (smaller model = 100); quality is <code>avg@8</code>. Both GPT-OSS and Qwen3.5 move toward the upper-left. Raw tokens are not compared across families because tokenizers differ.</figcaption>
+        <figure class="research-chart research-chart--dense">
+          <img src="/assets/quality-token-math500-all-budgets-en.svg" alt="MATH500 quality versus visible thinking tokens across 4K, 8K, 16K, and 32K budgets for GPT-OSS and Qwen3.5." width="1100" height="1250" loading="lazy">
+          <figcaption><strong>Figure 2.</strong> The Josh McGrath-style two-dimensional view extended across 4K, 8K, 16K, and 32K budgets on MATH500. Each family has its own thinking-token x-axis, so absolute lengths are not compared across tokenizers. GPT-OSS 120B is already near its accuracy plateau around 8K; the focused middle panel therefore separates its four <code>avg@8</code> and mean-thinking-token readings without interpreting small within-plateau fluctuations as a new trend. Qwen3.5 retains a clearly rising budget trajectory. Hollow points retain strict accuracy but are censored from token-efficiency claims.</figcaption>
         </figure>
-        <figure class="research-chart">
-          <img src="/assets/reasoning-token-frontier-gpqa-k8-en.svg" alt="GPQA-Diamond at 32K quality versus relative thinking tokens for GPT-OSS and Qwen3.5." width="1100" height="680" loading="lazy">
-          <figcaption><strong>Figure 3.</strong> The same plane on GPQA-Diamond. Both larger models move descriptively toward the upper-left, but only GPT-OSS passes every measurement gate. Qwen3.5 is dashed: its strict accuracy remains valid, but its 32K token length is not admissible efficiency evidence.</figcaption>
+        <figure class="research-chart research-chart--dense">
+          <img src="/assets/quality-token-gpqa-all-budgets-en.svg" alt="GPQA-Diamond quality versus visible thinking tokens across 4K, 8K, 16K, and 32K budgets for GPT-OSS and Qwen3.5." width="1100" height="1250" loading="lazy">
+          <figcaption><strong>Figure 3.</strong> Four-budget trajectories on GPQA-Diamond. GPT-OSS 120B enters a 71.4%–73.1% plateau from 8K onward while mean thinking tokens move only from 1.73K to 1.80K; the focused panel makes those overlapping readings legible. At 32K, GPT-OSS uses 60.9% fewer thinking tokens than 20B while accuracy rises from 66.9% to 73.1%. Qwen3.5 shows a clear four-budget quality climb, but every GPQA cell fails a measurement gate, so the entire trajectory is descriptive rather than admissible token-efficiency evidence.</figcaption>
         </figure>
+        <p><strong>Relation to the official GPT-OSS model card.</strong> Its Figure 3 already plots 20B/120B quality–<code>CoT+Answer</code> curves on AIME 2025 and GPQA-Diamond. The plotted points align with Table 3's <code>with tools</code> rows and primarily demonstrate test-time scaling as reasoning effort increases. The closest comparison to our no-tools, fixed-medium, hard-cap protocol is instead Table 3's <code>medium / no tools</code> column: GPQA-Diamond is <strong>66.0%→73.1%</strong>, nearly identical to our <strong>66.9%→73.1%</strong>; AIME 2025 is <strong>72.1%→80.0%</strong>, directionally consistent with our <strong>74.2%→83.3%</strong>. MATH500 does not appear in the model card. AIME 2024 changes from the card's <strong>80.0%→80.4%</strong> to our <strong>84.6%→81.7%</strong>, a useful warning against turning the agreement into a universal law.</p>
+        <p>We therefore do not claim the two-dimensional presentation or the basic GPT-OSS direction as a first discovery. The more accurate contribution is a controlled replication under fixed effort, K=8, and explicit measurement gates, extended with thinking-only tokens, MATH500, and a second family, Qwen3.5. The official numbers serve as external consistency evidence; they are not pooled with our rows, confidence intervals, or acceptance statistics.</p>
 
         <h3>GPT-OSS: the clearest positive result</h3>
         <p>In all five eligible fixed-budget comparisons, GPT-OSS 120B uses fewer thinking tokens than 20B. In four, it is also more accurate. All four quality-matched frontier points show token savings.</p>
@@ -115,25 +119,25 @@
           <li>GPQA-Diamond: <strong>66.9% → 73.1%</strong>, with <strong>60.9% fewer</strong> thinking tokens.</li>
           <li>AIME 2025: <strong>74.2% → 83.3%</strong>, with <strong>48.5% fewer</strong> thinking tokens.</li>
         </ul>
-        <p>AIME 2024 is the useful counterexample: thinking falls by 50.2%, but accuracy drops from 84.6% to 81.7%. Scale does not dominate every task.</p>
+        <p>AIME 2024 is a counterexample: thinking falls by 50.2%, but accuracy drops from 84.6% to 81.7%. Scale does not dominate every task.</p>
 
         <h3>Qwen3.5: positive, but narrower</h3>
         <p>On MATH500 at 32K, Qwen3.5 27B improves from <strong>93.3% to 98.0%</strong> while using <strong>18.7% fewer thinking tokens</strong> and <strong>18.7% fewer total tokens</strong> than 9B.</p>
         <p>AIME accuracy also favors the larger model—70.8% to 79.2% on AIME 2024 and 62.1% to 77.9% on AIME 2025—but those cells fail final-validity or truncation gates. They remain strict-accuracy evidence and are excluded from the uncensored token-efficiency claim.</p>
 
         <h2>The parser question</h2>
-        <p>The Qwen3.5 AIME failures initially looked like a parser bug. Artifact inspection showed that they were mainly model behavior. Qwen3.5 preserves a valid thinking/answer partition but often consumes the budget before emitting a terminal answer. The dominant failure is therefore an incomplete reasoning-to-final transition, not a global extraction bug.</p>
-        <p>That diagnosis matters because blindly rerunning the same configuration would not automatically fix a systematic finalization pattern. We retained strict accuracy, censored token-efficiency claims where required, and avoided selecting only well-finalized traces.</p>
+        <p>Qwen3.5's AIME gate failures could initially be mistaken for a parser problem. Artifact audits show that the thinking/answer partition is valid; the dominant failure occurs during the reasoning-to-final transition, when long reasoning consumes the budget before a terminal answer is emitted.</p>
+        <p>Increasing the sample count under the same configuration would not remove this systematic finalization behavior. We therefore kept strict accuracy, censored token-efficiency claims where required, and avoided “repairing” the dataset by selecting only well-finalized traces.</p>
 
         <h2>What the three ineligible families taught us</h2>
-        <p>The screening outcome becomes more useful when failure is separated into parser behavior, model finalization, substantive scale effects, and inference-configuration interactions.</p>
+        <p>The earlier screening funnel summarized the outcome. Here we separate four diagnostic layers: whether the parser worked, whether the model completed the reasoning-to-final transition, whether scale produced a real quality advantage, and whether architecture or inference settings made the comparison uninterpretable.</p>
         <div class="table-wrap">
           <table class="post-table">
-            <thead><tr><th>Family</th><th>Parser / partition</th><th>Scale evidence</th><th>Classification</th></tr></thead>
+            <thead><tr><th>Family</th><th>Parser and token partition</th><th>Model/scale behavior</th><th>Configuration interaction</th><th>Classification</th></tr></thead>
             <tbody>
-              <tr><td>Ministral-3</td><td>Completed streams parse; missing finals originate upstream.</td><td>14B loses to 8B on MATH500.</td><td>Measurement failure + real reversal</td></tr>
-              <tr><td>Qwen3</td><td>No primary parser failure.</td><td>AIME leans larger; MATH500 favors smaller.</td><td>Scale not identifiable</td></tr>
-              <tr><td>GLM-4.5</td><td>Token partitions are valid.</td><td>Air wins on AIME; GPQA reverses.</td><td>Counterexample + cap sensitivity</td></tr>
+              <tr><td>Ministral-3</td><td>Official parser handles completed streams; parser is not the primary cause.</td><td>AIME often fails to finish; 14B is materially worse than 8B on MATH500.</td><td>Long caps amplify non-finalization and truncation.</td><td>Measurement failure plus a real quality reversal.</td></tr>
+              <tr><td>Qwen3</td><td>No evidence of a primary parser failure.</td><td>AIME leans larger; MATH500 favors the smaller model in both quality and tokens.</td><td>MoE activation scale, post-training, and incomplete matrix are confounded.</td><td>Valid pilot, but scale is not identifiable.</td></tr>
+              <tr><td>GLM-4.5</td><td>Token partition is valid, ruling out a global parser failure.</td><td>Air beats full GLM on AIME; GPQA reverses direction.</td><td>High truncation and low final validity interact strongly with the 32K cap.</td><td>A substantive AIME counterexample, not a stable cross-task law.</td></tr>
             </tbody>
           </table>
         </div>
@@ -144,33 +148,27 @@
         <h3>Qwen3: successful execution, but scale is not a clean variable</h3>
         <p>The Qwen3 pilot showed no primary parser failure, but its direction depends on the task: AIME leans toward 235B-A22B, while on MATH500 the 30B-A3B model is both more accurate (<strong>94.2% versus 89.8%</strong>) and shorter (<strong>3.34K versus 4.04K</strong> total tokens). The report shows that the pair also differs in active parameters (3B versus 22B), depth, distillation, and post-training; official AIME inference uses a stop-thinking transition and a <strong>38,912</strong>-token cap rather than our hard 32K cutoff. This is therefore a valid but confounded pilot, not an identifiable parameter-scale treatment. Future MoE comparisons should control active scale, training recipe, and finalization protocol together.</p>
 
-        <h3>GLM-4.5: a counterexample plus inference-setting sensitivity</h3>
+        <h3>GLM-4.5: a real counterexample plus inference-configuration sensitivity</h3>
         <p>At 32K on AIME, GLM-4.5-Air reaches <strong>64.4%</strong> <code>avg@8</code> versus <strong>55.0%</strong> for the full model; valid token partitions rule out a parser explanation. GPQA reverses direction and final validity is low, so the counterexample interacts strongly with output cap and exit-reasoning behavior. The report uses hybrid expert distillation and trains reasoning RL directly at <strong>64K</strong>; our 32K cap may amplify the issue, but a seed-0 64K diagnostic still did not restore larger-model dominance. The best classification is a genuine AIME counterexample plus configuration sensitivity, best followed up with targeted budget, template, stop-condition, and forced-finalization ablations.</p>
 
-        <h3>A reusable diagnostic order</h3>
+        <h3>A diagnostic order for future community studies</h3>
         <ol>
-          <li>Separate completed execution from eligible measurement.</li>
-          <li>Unit-test parsers on complete streams and control tasks.</li>
-          <li>Keep strict accuracy while censoring ineligible token lengths.</li>
-          <li>Sweep output caps before attributing failure to capability.</li>
-          <li>Treat active MoE scale and post-training as confounders.</li>
-          <li>Preserve valid smaller-model wins as counterexamples.</li>
+          <li><strong>Separate “the run completed” from “the measurement is eligible.”</strong> Complete coverage does not imply valid finals, valid token partitions, or acceptable truncation.</li>
+          <li><strong>Unit-test the parser on completed streams and control tasks.</strong> If completed streams parse but failed samples never contain a final answer, the root cause is usually finalization rather than extraction.</li>
+          <li><strong>Keep strict accuracy and censor token efficiency.</strong> A missing final is an error, but its short output must not be rewarded as efficient.</li>
+          <li><strong>Test budget interactions.</strong> Use multiple caps; a 32K-only result cannot separate capability from long-reasoning non-finalization.</li>
+          <li><strong>Do not use total MoE parameters as the only scale axis.</strong> Control or report active parameters, routing, and post-training differences.</li>
+          <li><strong>Preserve genuine counterexamples.</strong> If the smaller model is better under valid measurement, it should constrain the conclusion rather than be relabeled as dirty data.</li>
         </ol>
-        <p>“Excluded from the main result” can mean invalid measurement, a non-identifiable comparison, or a genuinely better smaller model. Those are scientifically different outcomes.</p>
+        <p>“Excluded from the main result” can therefore mean at least three scientifically different things: invalid measurement, a confounded causal comparison, or a genuinely better smaller model. Keeping them separate is the most reusable lesson beyond the headline result.</p>
 
-        <h2>What I believe after the experiment</h2>
-        <blockquote>Within some controlled model families, a larger model can achieve equal or better quality with fewer visible reasoning tokens. The effect is strong for GPT-OSS and present but narrower for Qwen3.5.</blockquote>
-        <p>A 50.6% reduction in visible reasoning for GPT-OSS MATH500 and an 18.7% reduction for Qwen3.5 MATH500 are large enough to matter operationally. But they are not a universal law of parameter scale.</p>
-        <p>The more general lesson is methodological: reasoning models should be evaluated on a <strong>quality–token frontier</strong> with explicit final-validity, token-partition, and truncation gates. Accuracy alone hides whether a model merely thinks longer; token length alone can reward responses that never finish.</p>
-
-        <h2>Takeaways</h2>
+        <h2>Takeaways: what the experiment supports—and what it does not</h2>
+        <blockquote>Within some controlled model families, a larger model can achieve equal or better quality with fewer visible reasoning tokens. The evidence is strong for GPT-OSS and directionally consistent but narrower for Qwen3.5.</blockquote>
         <ul>
-          <li><strong>Larger models can use fewer thinking tokens, but only as a conditional within-family pattern.</strong> The evidence is strong for GPT-OSS and directionally consistent but narrower for Qwen3.5; it does not establish a universal law across architectures or training recipes.</li>
-          <li><strong>Reasoning efficiency must combine quality and token use.</strong> A shorter response that never reaches a valid final answer is not efficient. Final validity, token partitioning, and truncation are part of the metric—not post-hoc cleanup.</li>
-          <li><strong>“Scale” is meaningful only inside a genuinely comparable family.</strong> Architecture, training data, post-training, active MoE scale, and tokenizer all confound the comparison. This study provides observational evidence, not a causal effect of parameter count.</li>
-          <li><strong>Visible reasoning tokens are not total compute.</strong> A larger model may generate fewer tokens while still costing more per token in FLOPs, latency, or deployment expense. Operational choices should evaluate those system costs alongside the quality–token frontier.</li>
-          <li><strong>Excluded families still produce useful evidence.</strong> Invalid measurement, a confounded comparison, and a genuine smaller-model win are scientifically different outcomes; they should not all be labeled “failed experiments” or filtered away to manufacture a clean law.</li>
-          <li><strong>The evidence still has finite resolution.</strong> The frontier uses four discrete budgets, some Qwen3.5 cells are censored, and GPT-OSS high-effort remains an incomplete auxiliary slice. A useful next study would densify the budget sweep, finish the auxiliary slice, and add total-compute measures rather than extrapolate the present trend.</li>
+          <li><strong>This is a conditional within-family pattern, not a law of parameter scale.</strong> Visible reasoning falls 50.6% for GPT-OSS on MATH500 and 18.7% for Qwen3.5, but those results do not establish a universal relationship across architectures or training recipes.</li>
+          <li><strong>Reasoning efficiency must combine quality, thinking tokens, and measurement validity.</strong> A shorter response that never reaches a valid final answer is not efficient. Final validity, token partitioning, and truncation are part of the metric, not post-hoc cleanup.</li>
+          <li><strong>Families outside the main result reveal measurement failure, comparison confounding, and genuine counterexamples.</strong> “Scale” is meaningful only when architecture, post-training, active MoE scale, and tokenizer are sufficiently comparable; counterexamples should not be filtered away to manufacture a clean law.</li>
+          <li><strong>Visible tokens are not total compute, and the present frontier has finite resolution.</strong> A larger model may generate fewer tokens while costing more per token in FLOPs, latency, or deployment expense. The study samples four budgets, censors some Qwen3.5 cells, and retains GPT-OSS high-effort only as an incomplete auxiliary slice.</li>
         </ul>
 
         <h2>Research scale</h2>
@@ -191,25 +189,27 @@
       <div class="post-language" data-lang-content="zh" lang="zh-CN" hidden>
         <h2>这个项目从 Yann Dubois 的一段访谈开始</h2>
         <p>这个项目的起点不是一张 benchmark 表，而是我读到的一段访谈。共同领导 OpenAI post-training frontiers 团队的 Yann Dubois 在 <em>The MAD Podcast with Matt Turck</em> 中谈到预训练规模与推理效率时，英文原话是：</p>
-        <blockquote>“One thing that I do want to highlight when we're talking, for example, with efficiency: if you have larger models, the amount of thinking time—so the amount of tokens they will think for—will usually decrease. And the way that you can think about it is that, metaphorically, the model already thinks through its weights when it generates a certain token. So you can decrease the number of, like, tokens that you need to generate for thinking by kind of, like, increasing the size of the model that you are training. So oftentimes, if you just increase the model size—if you basically pre-train larger models—you will get better efficiency.”<br><span class="quote-source">——Yann Dubois，<a href="https://www.youtube.com/watch?v=DhD1zZ8w8Mw&amp;t=1474s" target="_blank" rel="noreferrer">原始英文访谈 24:34–25:23</a>（根据公开视频英文自动字幕校正标点，删去 <em>um</em>、<em>uh</em> 等口语停顿词）</span></blockquote>
-        <p>本文译意是：更大的模型通常会用更少的 thinking tokens；模型生成 token 时，已经通过自身权重完成了一部分“思考”，因此扩大模型并预训练更大的模型，往往能提高推理效率。</p>
-        <p>这正是我当时产生验证想法的一段话。它把三个判断直接连在了一起：更大的预训练模型、已经发生在权重中的“思考”，以及更少的显式 thinking tokens。这个解释直觉上很对——能力如果已经更多地内化进参数，推理时或许就不必用同样长的可见轨迹重新搜索。</p>
+        <blockquote>“If you have larger models, the amount of thinking time—so the amount of tokens they will think for—will usually decrease. […] The model already thinks through its weights when it generates a certain token. So you can decrease the number of tokens that you need to generate for thinking by increasing the size of the model […] if you basically pre-train larger models, you will get better efficiency.”<br><span class="quote-source">——Yann Dubois，<a href="https://www.youtube.com/watch?v=DhD1zZ8w8Mw&amp;t=1474s" target="_blank" rel="noreferrer">原始英文访谈节选，24:34–25:23</a></span></blockquote>
+        <p>这段话的核心是：更大的模型通常会用更少的 thinking tokens；模型生成 token 时，已经通过自身权重完成了一部分“思考”，因此扩大模型并预训练更大的模型，往往能提高推理效率。</p>
+        <p>这段判断直接启发了本研究。它把三个判断连在了一起：更大的预训练模型、已经发生在权重中的“思考”，以及更少的显式 thinking tokens。这个解释直觉上很对——能力如果已经更多地内化进参数，推理时或许就不必用同样长的可见轨迹重新搜索。</p>
         <p>但直觉不是证据。这段话来自访谈而不是 OpenAI 的正式技术报告；Dubois 说的也是“通常会减少”，并不等于对所有模型家族、任务和预算都成立。要验证它，不能只比较 leaderboard 分数，也不能把输出更短直接当作更高效：一个模型可能只是更早截断，甚至没有给出最终答案。真正需要问的是：</p>
         <blockquote>在同一模型家族内，当任务、输出预算、解码规则和重复采样协议保持一致时，较大模型能否用更少的可见 thinking tokens，达到相同或更高的质量？</blockquote>
-        <p>刚好我最近在探索 Auto Research：能否让前沿模型参与提出假设、设计实验、编排远端任务、审计产物、诊断失败，再把证据收敛成可复核的报告。于是，我把 Yann 的这个判断变成了这次 Auto Research 的研究目标。</p>
+        <p>当时我正在探索 Auto Research：能否让前沿模型参与提出假设、设计实验、编排远端任务、审计产物、诊断失败，再把证据收敛成可复核的报告。因此，我把 Yann 的判断设为一个具体研究问题。</p>
         <p>在把直觉变成实验时，Noam Brown 和 Josh McGrath 的公开讨论又补齐了两块：Brown 强调额外的测试时计算只有在模型能力足够时才有价值；McGrath 建议把模型进步画在“质量—token”二维平面上，看它是否真正向左上方移动。三者合在一起，形成了完整的实验逻辑：Yann 提供效率机制的直觉，Brown 给出能力前提，McGrath 给出测量坐标。</p>
         <p>实验设计也由此推出：在每个家族内比较两个规模，固定任务和生成协议，扫描多档输出预算，对每道题进行重复采样；只有最终答案有效率、token 分区和截断率都通过预设门禁时，才允许进入 token 效率比较。</p>
-        <p>GPT-5.5 和 GPT-5.6 作为研究协作者参与了整个流程：追溯和质疑原始假设、设计实验矩阵、审计远端任务、诊断测量失败、分析验收后的产物，以及协助准备实验报告、论文初稿和这篇文章。它们本身不是结论的证据；下面每个实证数字都来自可复核的任务日志和通过验收的结果文件。</p>
-        <p>下面这张路线图压缩了项目真正改变方向的八个节点。橙色侧枝表示被诊断后降级为补充或边界证据的研究路线，而不是简单的实验执行失败。</p>
+        <p>GPT-5.5 和 GPT-5.6 作为研究协作者参与了整个流程：追溯和质疑原始假设、设计实验矩阵、审计远端任务、诊断测量失败、分析验收后的产物，以及协助准备实验报告、论文初稿和这篇文章。它们本身不是结论的证据；文章中的实证数字均来自可复核的任务日志和通过验收的结果文件。</p>
+        <p>图 1 概括了研究过程中八个关键决策节点。橙色侧枝表示被诊断后降级为补充或边界证据的研究路线，而不是简单的实验执行失败。</p>
         <figure class="research-chart research-process-map">
           <img src="/assets/research-process-map-zh.svg" alt="从访谈观点到条件性结论、包含八个主干决策的纵向 Auto Research 研究路线图。" width="1100" height="1480" loading="lazy">
           <figcaption><strong>图 1。</strong>从访谈观点到可验证结论的 Auto Research 收敛路径。蓝色实线是最终被采纳的研究主干；橙色虚线分支是经过诊断后被降级为边界证据的路线，并不等于实验执行失败。</figcaption>
         </figure>
 
         <h2>从广泛选型到两个正式实验家族</h2>
-        <p>项目并不是从两个“答案正确”的家族开始。最初的候选池包括 GPT-OSS、Qwen3.5 Dense、Ministral-3、Qwen3 和 GLM-4.5。我们先做 pilot，再判断每个家族能否形成可解释的同家族尺度对照。</p>
+        <p>项目并不是从 GPT-OSS 和 Qwen3.5 两个“答案正确”的家族开始。最初的候选池还包括 Ministral-3、Qwen3 和 GLM-4.5。我们先做小规模 pilot，再检查能否形成可解释的同家族尺度对照。</p>
         <div class="method-note"><strong>进入正式矩阵的条件。</strong>同家族内至少有两个可比较规模；tokenizer、模板、解析器和生成协议能够匹配；任务、预算和重复采样覆盖足够；final validity、token 分区与截断率允许可靠测量 token。</div>
-        <p>筛选后，GPT-OSS 和 Qwen3.5 Dense 形成最清楚的受控比较。Ministral-3、Qwen3 和 GLM-4.5 并不是因为结果“不漂亮”才被删除：它们分别暴露了测量失效、架构混杂、真实尺度反转与推理预算交互。证据范围是按<strong>可比性与测量有效性</strong>冻结的，而不是按哪个家族支持假设来挑选。</p>
+        <p>GPT-OSS 还有一个额外的先验优势：OpenAI 的<a href="https://cdn.openai.com/pdf/419b6906-9da6-406c-a19d-1bb078ac7637/oai_gpt-oss_model_card.pdf" target="_blank" rel="noreferrer">官方 model card</a>已经提供了 20B/120B 同家族尺度对、官方 Harmony 格式，以及 AIME 与 GPQA-Diamond 的多档 reasoning-effort 评测。尤其是其中的图 3，它把 low、medium、high 三档推理强度画在“准确率—平均 <code>CoT+Answer</code> tokens”平面上，已经显示 120B 往往能以更短输出进入相近或更高质量区。这不是我们实验的一部分，也不计入下文统计，但它说明 GPT-OSS 同时具备可比较尺度、可靠 token 通道和现成的质量—token 先验，是很适合进一步做受控验证的模型家族。</p>
+        <p>筛选之后，GPT-OSS 和 Qwen3.5 Dense 能形成最清楚的受控对照，因此进入面向公开结论的主矩阵。Ministral-3、Qwen3 和 GLM-4.5 并不是因为“结论不漂亮”才被删除：它们分别暴露了测量不合格、架构混杂、真实尺度反转和推理预算交互，并作为失败模式与边界证据单独分析。</p>
+        <p>最终证据范围是按<strong>可比性与测量有效性</strong>冻结的，而不是按某个家族是否支持原始假设来筛选。未进入主矩阵的家族同样构成实验结果。</p>
 
         <h2>实验设置</h2>
         <div class="table-wrap">
@@ -221,7 +221,7 @@
             </tbody>
           </table>
         </div>
-        <p>从这里开始引入 <strong>K=8</strong>。主实验比较 <strong>4 个模型</strong>，覆盖 MATH500、GPQA-Diamond、AIME 2024 和 AIME 2025 <strong>4 个任务</strong>，扫描 4K、8K、16K 和 32K <strong>4 档最大输出预算</strong>；每个“模型—题目—预算”单元进行 <strong>8 次独立 rollout</strong>。</p>
+        <p>实验采用统一的 <strong>K=8</strong> 协议。主实验比较 <strong>4 个模型</strong>，覆盖 MATH500、GPQA-Diamond、AIME 2024 和 AIME 2025 <strong>4 个任务</strong>，扫描 4K、8K、16K 和 32K <strong>4 档最大输出预算</strong>；每个“模型—题目—预算”单元进行 <strong>8 次独立 rollout</strong>。</p>
         <div class="metric-strip" aria-label="实验规模">
           <div><strong>4</strong><span>个模型</span></div>
           <div><strong>4</strong><span>个任务</span></div>
@@ -243,14 +243,16 @@
             </tbody>
           </table>
         </div>
-        <figure class="research-chart">
-          <img src="/assets/reasoning-token-frontier-k8-zh.svg" alt="MATH500 32K 下 GPT-OSS 与 Qwen3.5 的质量和相对 thinking tokens 二维图。" width="1100" height="680" loading="lazy">
-          <figcaption><strong>图 2。</strong>把 Josh McGrath 提到的二维评价方式落到最干净的共同切片。thinking tokens 在每个家族内归一化（小模型 = 100），质量为 <code>avg@8</code>。GPT-OSS 与 Qwen3.5 都向左上方移动。由于 tokenizer 不同，图中不跨家族比较原始 token 数。</figcaption>
+        <figure class="research-chart research-chart--dense">
+          <img src="/assets/quality-token-math500-all-budgets-zh.svg" alt="MATH500 四档预算下 GPT-OSS 与 Qwen3.5 的质量和可见 thinking tokens 二维图。" width="1100" height="1250" loading="lazy">
+          <figcaption><strong>图 2。</strong>把 Josh McGrath 提到的二维评价方式扩展到 MATH500 的 4K、8K、16K 和 32K 四档预算。两个家族各自使用独立的 thinking-token 横轴，不跨 tokenizer 比较绝对长度。GPT-OSS 120B 在 8K 左右已经进入准确率平台，因此中间的局部诊断面板分开标出四档 <code>avg@8</code> 与平均 thinking tokens；它是读数放大镜，不把平台内的小幅波动解释成新趋势。Qwen3.5 的预算轨迹则仍清晰向右上方延伸。空心点表示该预算单元只保留严格准确率，不进入 token-efficiency 主结论。</figcaption>
         </figure>
-        <figure class="research-chart">
-          <img src="/assets/reasoning-token-frontier-gpqa-k8-zh.svg" alt="GPQA-Diamond 32K 下 GPT-OSS 与 Qwen3.5 的质量和相对 thinking tokens 二维图。" width="1100" height="680" loading="lazy">
-          <figcaption><strong>图 3。</strong>同一张二维图在 GPQA-Diamond 上的结果。两个家族的大模型在描述性结果上都向左上方移动，但只有 GPT-OSS 通过全部测量门禁。Qwen3.5 用虚线标出：其严格准确率仍然有效，但 32K token 长度不能作为可采纳的效率证据。</figcaption>
+        <figure class="research-chart research-chart--dense">
+          <img src="/assets/quality-token-gpqa-all-budgets-zh.svg" alt="GPQA-Diamond 四档预算下 GPT-OSS 与 Qwen3.5 的质量和可见 thinking tokens 二维图。" width="1100" height="1250" loading="lazy">
+          <figcaption><strong>图 3。</strong>GPQA-Diamond 的四档预算轨迹。GPT-OSS 120B 从 8K 起进入 71.4%–73.1% 的平台区，平均 thinking tokens 只从 1.73K 增至 1.80K；局部面板让这些重叠读数可辨。到 32K 时，GPT-OSS 相比 20B 少用 60.9% thinking tokens，准确率从 66.9% 提升到 73.1%。Qwen3.5 的四档质量爬升清晰可见，但所有 GPQA 单元都没有通过测量门禁，因此整条轨迹只作描述，不构成可采纳的 token-efficiency 证据。</figcaption>
         </figure>
+        <p><strong>与官方 GPT-OSS model card 的关系。</strong>官方图 3 已经在 AIME 2025 和 GPQA-Diamond 上画过 20B/120B 的质量—<code>CoT+Answer</code> 曲线；图中点位与表 3 的 <code>with tools</code> 结果一致，主要用于说明提高 reasoning effort 带来的 test-time scaling。与我们无工具、固定 medium effort、四档硬预算的设置最接近的是表 3 的 <code>medium / no tools</code>：GPQA-Diamond 为 <strong>66.0%→73.1%</strong>，与我们的 <strong>66.9%→73.1%</strong> 几乎一致；AIME 2025 为 <strong>72.1%→80.0%</strong>，也与我们的 <strong>74.2%→83.3%</strong> 同向。MATH500 没有出现在 model card 中；AIME 2024 则由官方的 <strong>80.0%→80.4%</strong> 变成我们观察到的 <strong>84.6%→81.7%</strong>，提醒我们不能把一致性扩张成普适定律。</p>
+        <p>因此，我们不把二维图或 GPT-OSS 上的基本方向主张为首次发现。更准确的定位是：对官方先验做固定策略、K=8 和测量门禁下的受控复验，并用 thinking-only token、MATH500 与 Qwen3.5 把证据扩展到官方 model card 没有覆盖的分析口径和模型家族。官方结果只作为外部一致性证据，不与我们的实验行数、置信区间或验收统计合并。</p>
 
         <h3>GPT-OSS：最清晰的正向结果</h3>
         <p>在 5 个通过门禁的固定预算比较中，GPT-OSS 120B 的 thinking tokens 全部少于 20B；其中 4 个单元同时具有更高准确率。4 个等质量前沿点也全部显示 token 节省。</p>
@@ -259,25 +261,25 @@
           <li>GPQA-Diamond：<strong>66.9% → 73.1%</strong>，thinking tokens 减少 <strong>60.9%</strong>；</li>
           <li>AIME 2025：<strong>74.2% → 83.3%</strong>，thinking tokens 减少 <strong>48.5%</strong>。</li>
         </ul>
-        <p>AIME 2024 是一个有价值的反例：thinking tokens 虽然减少了 50.2%，准确率却从 84.6% 降到 81.7%。规模并不会在每个任务上都形成支配。</p>
+        <p>AIME 2024 构成一个反例：thinking tokens 虽然减少了 50.2%，准确率却从 84.6% 降到 81.7%。规模并不会在每个任务上都形成支配。</p>
 
         <h3>Qwen3.5：方向一致，但证据更窄</h3>
         <p>在 MATH500 的 32K 设置下，Qwen3.5 27B 的准确率从 <strong>93.3% 提升到 98.0%</strong>，同时比 9B 少用 <strong>18.7% thinking tokens</strong> 和 <strong>18.7% total tokens</strong>。</p>
         <p>AIME 的准确率同样更偏向大模型：AIME 2024 从 70.8% 提升到 79.2%，AIME 2025 从 62.1% 提升到 77.9%。但这些单元没有通过最终答案有效率或截断率门禁，因此仍是有效的严格准确率结果，却不进入未删失的 token 效率结论。</p>
 
         <h2>到底是不是解析器的问题？</h2>
-        <p>Qwen3.5 的 AIME 失败一开始看上去很像解析器问题。逐条检查产物后发现，主要原因其实是模型行为。thinking/answer 分区本身有效，但长推理经常耗尽预算，来不及输出终止性的最终答案。主要失败因此是 reasoning-to-final 转换没有完成，而不是全局性的抽取错误。</p>
-        <p>这个诊断很重要，因为用同一配置大规模补跑，并不会自动解决系统性的收尾行为。因此我们保留严格准确率，在需要时删失 token 效率结论，也不通过只保留“收尾良好”的样本来人为修复数据。</p>
+        <p>Qwen3.5 的 AIME 门禁失败最初可能被误判为解析器问题。产物审计表明，thinking/answer token 分区有效；主要失败发生在 reasoning-to-final 转换阶段：长推理耗尽预算后，模型未能输出终止性的最终答案。</p>
+        <p>因此，按同一配置增加样本量不会消除这一系统性收尾问题。我们保留严格准确率，按门禁删失 token 效率，也不通过筛选“收尾良好”的样本来人为修复数据。</p>
 
         <h2>三个未通过家族告诉了我们什么</h2>
-        <p>把失败进一步拆开，需要分别判断解析器、模型收尾、真实尺度效应，以及架构/推理配置交互。</p>
+        <p>前面的选型漏斗只概括了筛选结果。这里进一步把失败拆成四层：解析器是否正确、模型是否完成 reasoning-to-final、大小模型是否真的形成质量优势，以及推理预算/架构配置是否让比较失去可解释性。</p>
         <div class="table-wrap">
           <table class="post-table">
-            <thead><tr><th>家族</th><th>解析器 / 分区</th><th>尺度现象</th><th>分类</th></tr></thead>
+            <thead><tr><th>家族</th><th>解析器与 token 分区</th><th>模型/尺度现象</th><th>配置交互</th><th>最终判断</th></tr></thead>
             <tbody>
-              <tr><td>Ministral-3</td><td>完整流可解析；缺失 final 发生在上游。</td><td>MATH500 上 14B 弱于 8B。</td><td>测量失效 + 真实反转</td></tr>
-              <tr><td>Qwen3</td><td>没有主要解析器故障。</td><td>AIME 偏向大模型，MATH500 偏向小模型。</td><td>规模变量不可识别</td></tr>
-              <tr><td>GLM-4.5</td><td>token 分区有效。</td><td>AIME 上 Air 胜出，GPQA 方向相反。</td><td>反例 + 预算敏感</td></tr>
+              <tr><td>Ministral-3</td><td>完整生成流可被官方解析器处理；解析器不是主因。</td><td>AIME 经常没有完成 reasoning-to-final；MATH500 上 14B 明显弱于 8B。</td><td>长预算放大未收尾与截断。</td><td>测量不合格，同时存在真实质量反转。</td></tr>
+              <tr><td>Qwen3</td><td>没有证据表明解析器是主要故障。</td><td>AIME 偏向大模型，MATH500 却由小模型同时赢得质量与 token。</td><td>MoE 激活规模、后训练和不完整矩阵混杂。</td><td>pilot 有效，但无法归因于“规模”。</td></tr>
+              <tr><td>GLM-4.5</td><td>token 分区有效，排除全局解析器故障。</td><td>AIME 上 Air 胜过完整模型；GPQA 方向相反。</td><td>高截断、低 final validity，与 32K cap 强交互。</td><td>AIME 是实质反例，但不能形成稳定跨任务规律。</td></tr>
             </tbody>
           </table>
         </div>
@@ -291,30 +293,24 @@
         <h3>GLM-4.5：真实反例叠加推理配置敏感性</h3>
         <p>32K AIME 上，GLM-4.5-Air 的 <code>avg@8</code> 为 <strong>64.4%</strong>，高于完整模型的 <strong>55.0%</strong>；两者 token 分区有效，因此不能归咎于 parser。GPQA 的方向却相反，而且 final validity 偏低，说明这个反例与预算和退出推理行为存在强交互。技术报告采用 hybrid expert distillation，并直接在 <strong>64K</strong> 长度上做 reasoning RL；我们的 32K cap 可能放大问题，但 seed0 的 64K 诊断仍未恢复大模型优势。最稳妥的判断是“真实 AIME 反例 + 配置敏感性”，下一步应做预算、模板、终止条件和强制收尾的小规模消融。</p>
 
-        <h3>一套可复用的诊断顺序</h3>
+        <h3>给后续社区实验的诊断顺序</h3>
         <ol>
-          <li>区分“任务跑完”和“测量合格”；</li>
-          <li>用完整生成流和控制任务单测 parser；</li>
-          <li>保留严格准确率，同时删失不合格 token 长度；</li>
-          <li>扫描多档预算，再判断是否属于能力问题；</li>
-          <li>把 MoE 激活规模与后训练视为混杂变量；</li>
-          <li>保留有效的小模型胜出，把它当作真实反例。</li>
+          <li><strong>先分开“跑完了”和“能测量”。</strong>覆盖完整不代表 final validity、token partition 与截断率合格。</li>
+          <li><strong>用完整生成流和控制任务单测 parser。</strong>如果完整流能解析，而失败样本根本没有 final，根因通常在模型收尾而非抽取器。</li>
+          <li><strong>严格准确率保留，token 效率删失。</strong>缺失 final 应计为错误，但不能用其短 token 长度证明高效。</li>
+          <li><strong>检查预算交互。</strong>至少比较多档 cap；只看 32K 无法区分能力差异与长推理未收尾。</li>
+          <li><strong>不要把 MoE 总参数当作唯一尺度轴。</strong>同时控制或报告激活参数、路由与后训练差异。</li>
+          <li><strong>保留真实反例。</strong>如果小模型在有效测量下确实更好，它应当限制结论，而不是被重新归类成“脏数据”。</li>
         </ol>
-        <p>所以，“没有进入主结果”可能意味着测量无效、因果比较不可识别，或者小模型确实更好。这三种科学结论不能混为一谈。</p>
+        <p>因此，“没有进入主结果”至少可能表示三种不同的科学结果：测量不合格、因果比较存在混杂，或较小模型确实更好。把三者分开，是这轮实验除主结论之外最可复用的经验。</p>
 
-        <h2>实验之后，我如何理解这个问题</h2>
-        <blockquote>在某些受控模型家族内，更大的模型可以用更少的可见推理 token 达到相同或更高质量。这个效应在 GPT-OSS 上很强，在 Qwen3.5 上方向一致但证据更窄。</blockquote>
-        <p>GPT-OSS 在 MATH500 上减少 50.6% 的可见推理，Qwen3.5 减少 18.7%，都具有实际意义。但它们仍然不是“参数规模越大，token 效率越高”的普适定律。</p>
-        <p>更一般的方法论结论是：推理模型应该在一条<strong>质量—token 前沿</strong>上被评估，并明确设置最终答案有效率、token 分区有效率和截断率门禁。只看准确率，会掩盖模型是否只是想得更久；只看 token 长度，又可能错误奖励那些根本没有完成回答的响应。</p>
-
-        <h2>Takeaways：这次实验真正留下了什么</h2>
+        <h2>Takeaways：实验支持什么、不支持什么</h2>
+        <blockquote>在部分受控模型家族内，较大模型可以用更少的可见推理 token 达到相同或更高质量；GPT-OSS 证据较强，Qwen3.5 方向一致但范围更窄。</blockquote>
         <ul>
-          <li><strong>更大模型可以更省 thinking tokens，但这是一条有条件的家族内规律。</strong>GPT-OSS 的证据很强，Qwen3.5 的方向一致但范围更窄；它们不能推出跨架构、跨配方的普适规模定律。</li>
-          <li><strong>推理效率必须同时看质量和 token。</strong>更短但没有完成 final 的响应不是高效；final validity、token partition 和截断率不是清洗细节，而是指标本身的一部分。</li>
-          <li><strong>“规模”只有在可比家族内才是有意义的变量。</strong>架构、训练数据、后训练方法、MoE 激活规模和 tokenizer 都会混入比较，因此本文给出的是观察性证据，而不是参数量的因果效应。</li>
-          <li><strong>可见 reasoning tokens 不等于总计算成本。</strong>大模型可能生成更少 token，却仍有更高的单 token FLOPs、延迟或部署成本；真实选型应把这些系统指标与质量—token 前沿一起衡量。</li>
-          <li><strong>失败家族同样提供了可复用结论。</strong>测量不合格、因果比较混杂和小模型真实胜出是三种不同结果，不能都归为“实验失败”，更不能通过筛掉反例来制造整齐规律。</li>
-          <li><strong>当前证据仍有分辨率边界。</strong>前沿只采样了四档预算，部分 Qwen3.5 单元经过删失，GPT-OSS high-effort 仍是辅助不完整切片；下一轮更有价值的工作是加密预算、补齐辅助切片并加入总计算指标，而不是把现有趋势直接外推。</li>
+          <li><strong>这是有条件的家族内规律，不是参数规模定律。</strong>GPT-OSS 在 MATH500 上减少 50.6% 的可见推理，Qwen3.5 减少 18.7%，但这些结果不能外推为跨架构、跨训练配方的普适关系。</li>
+          <li><strong>推理效率必须联合衡量质量、thinking tokens 与测量有效性。</strong>更短但没有完成 final 的响应不是高效；final validity、token partition 和截断率是指标的一部分，而不是事后清洗。</li>
+          <li><strong>未进入主结果的家族分别揭示了测量失效、比较混杂和真实反例。</strong>“规模”只有在架构、后训练、MoE 激活规模和 tokenizer 足够可比时才是有意义的变量，不能通过筛掉反例制造整齐规律。</li>
+          <li><strong>可见 token 不等于总计算成本，当前前沿也只有有限分辨率。</strong>大模型可能生成更少 token，却仍有更高的单 token FLOPs、延迟或部署成本；现有实验只采样四档预算，部分 Qwen3.5 单元被删失，GPT-OSS high-effort 仍是辅助不完整切片。</li>
         </ul>
 
         <h2>这次验证的投入规模</h2>
