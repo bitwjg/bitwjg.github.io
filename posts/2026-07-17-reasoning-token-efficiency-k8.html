@@ -66,7 +66,7 @@
         <p>The project did not begin with GPT-OSS and Qwen3.5 as two hand-picked “winners.” The initial candidate pool also included Ministral-3, Qwen3, and GLM-4.5. We ran pilots first, then asked whether each family could support an interpretable within-family scale comparison.</p>
         <div class="method-note"><strong>Admission contract.</strong> A family needed two meaningfully comparable sizes; matched tokenizer, template, parser, and generation protocol; enough task, budget, and repeated-sampling coverage; and final-validity, token-partition, and truncation quality sufficient for trustworthy token measurement.</div>
         <p>GPT-OSS had one additional study-design advantage. OpenAI's <a href="https://cdn.openai.com/pdf/419b6906-9da6-406c-a19d-1bb078ac7637/oai_gpt-oss_model_card.pdf" target="_blank" rel="noreferrer">official model card</a> already supplied a 20B/120B within-family scale pair, the official Harmony format, and multi-effort evaluations on AIME and GPQA-Diamond. Figure 3 in particular places low, medium, and high reasoning effort on an accuracy-versus-average-<code>CoT+Answer</code> plane, where 120B often reaches a comparable or higher-quality region with shorter output. Those results are not part of our experiment and are not counted below, but they made GPT-OSS unusually well suited to a controlled follow-up: comparable scale points, reliable token channels, and a pre-existing quality–token prior.</p>
-        <p>GPT-OSS and Qwen3.5 Dense survived that screen and formed the cleanest controlled comparisons. Ministral-3, Qwen3, and GLM-4.5 were not removed because their results were inconvenient. They exposed different combinations of measurement failure, architectural confounding, real scale reversal, and inference-budget interaction, and are analyzed separately as failure modes and boundary evidence.</p>
+        <p>GPT-OSS and Qwen3.5 Dense survived that screen and formed the cleanest controlled comparisons. Ministral-3, Qwen3, and GLM-4.5 were excluded from the main matrix because of insufficient measurement validity, architectural or training-recipe confounding, real quality reversals, or strong inference-budget interactions. Their results are retained as failure-mode and boundary evidence.</p>
         <p>The final evidence scope was frozen by <strong>comparability and measurement validity</strong>, not by whether a family confirmed the hypothesis. Families outside the main matrix remain part of the result.</p>
 
         <h2>Experimental setup</h2>
@@ -208,7 +208,7 @@
         <p>项目并不是从 GPT-OSS 和 Qwen3.5 两个“答案正确”的家族开始。最初的候选池还包括 Ministral-3、Qwen3 和 GLM-4.5。我们先做小规模 pilot，再检查能否形成可解释的同家族尺度对照。</p>
         <div class="method-note"><strong>进入正式矩阵的条件。</strong>同家族内至少有两个可比较规模；tokenizer、模板、解析器和生成协议能够匹配；任务、预算和重复采样覆盖足够；final validity、token 分区与截断率允许可靠测量 token。</div>
         <p>GPT-OSS 还有一个额外的先验优势：OpenAI 的<a href="https://cdn.openai.com/pdf/419b6906-9da6-406c-a19d-1bb078ac7637/oai_gpt-oss_model_card.pdf" target="_blank" rel="noreferrer">官方 model card</a>已经提供了 20B/120B 同家族尺度对、官方 Harmony 格式，以及 AIME 与 GPQA-Diamond 的多档 reasoning-effort 评测。尤其是其中的图 3，它把 low、medium、high 三档推理强度画在“准确率—平均 <code>CoT+Answer</code> tokens”平面上，已经显示 120B 往往能以更短输出进入相近或更高质量区。这不是我们实验的一部分，也不计入下文统计，但它说明 GPT-OSS 同时具备可比较尺度、可靠 token 通道和现成的质量—token 先验，是很适合进一步做受控验证的模型家族。</p>
-        <p>筛选之后，GPT-OSS 和 Qwen3.5 Dense 能形成最清楚的受控对照，因此进入面向公开结论的主矩阵。Ministral-3、Qwen3 和 GLM-4.5 并不是因为“结论不漂亮”才被删除：它们分别暴露了测量不合格、架构混杂、真实尺度反转和推理预算交互，并作为失败模式与边界证据单独分析。</p>
+        <p>筛选之后，GPT-OSS 和 Qwen3.5 Dense 能形成最清楚的受控对照，因此进入面向公开结论的主矩阵。Ministral-3、Qwen3 和 GLM-4.5 则因测量有效性不足、尺度变量存在架构或训练配方混杂，或出现真实质量反转与明显的推理预算交互，没有纳入主矩阵；相关结果作为失败模式与边界证据单独分析。</p>
         <p>最终证据范围是按<strong>可比性与测量有效性</strong>冻结的，而不是按某个家族是否支持原始假设来筛选。未进入主矩阵的家族同样构成实验结果。</p>
 
         <h2>实验设置</h2>
@@ -230,7 +230,7 @@
         </div>
         <p>GPT-OSS high-effort 仅作为辅助分析，不参与主结论门禁；其他候选家族则保留在后文的失败诊断中。</p>
         <p>质量指标以 8 次 rollout 的平均准确率 <code>avg@8</code> 为主，<code>pass@8</code> 为辅助。token 成本被拆成 thinking、answer 和 total generated tokens。</p>
-        <div class="method-note"><strong>测量门禁。</strong>严格准确率始终把缺失或无法解析的最终答案计为错误。token 效率比较只有在最终答案有效率和 thinking/answer 分区有效率都至少达到 95% 时才会被采纳；32K 单元的截断率还必须不超过 5%。未通过的单元保留严格准确率，但在 token 效率分析中作删失处理。</div>
+        <div class="method-note"><strong>测量门禁。</strong>严格准确率始终把缺失或无法解析的最终答案计为错误。token 效率比较只有在最终答案有效率和 thinking/answer 分区有效率都至少达到 95% 时才会被采纳；32K 单元的截断率还必须不超过 5%。未通过的单元保留严格准确率，但排除在 token 效率分析之外。</div>
 
         <h2>最终聚合结果</h2>
         <p>结论不是普适规律，而是家族条件成立。</p>
@@ -265,11 +265,11 @@
 
         <h3>Qwen3.5：方向一致，但证据更窄</h3>
         <p>在 MATH500 的 32K 设置下，Qwen3.5 27B 的准确率从 <strong>93.3% 提升到 98.0%</strong>，同时比 9B 少用 <strong>18.7% thinking tokens</strong> 和 <strong>18.7% total tokens</strong>。</p>
-        <p>AIME 的准确率同样更偏向大模型：AIME 2024 从 70.8% 提升到 79.2%，AIME 2025 从 62.1% 提升到 77.9%。但这些单元没有通过最终答案有效率或截断率门禁，因此仍是有效的严格准确率结果，却不进入未删失的 token 效率结论。</p>
+        <p>AIME 的准确率同样更偏向大模型：AIME 2024 从 70.8% 提升到 79.2%，AIME 2025 从 62.1% 提升到 77.9%。但这些单元没有通过最终答案有效率或截断率门禁，因此仍是有效的严格准确率结果，却不进入 token 效率结论。</p>
 
         <h2>到底是不是解析器的问题？</h2>
         <p>Qwen3.5 的 AIME 门禁失败最初可能被误判为解析器问题。产物审计表明，thinking/answer token 分区有效；主要失败发生在 reasoning-to-final 转换阶段：长推理耗尽预算后，模型未能输出终止性的最终答案。</p>
-        <p>因此，按同一配置增加样本量不会消除这一系统性收尾问题。我们保留严格准确率，按门禁删失 token 效率，也不通过筛选“收尾良好”的样本来人为修复数据。</p>
+        <p>因此，按同一配置增加样本量不会消除这一系统性收尾问题。我们保留严格准确率，并按门禁将相关单元排除在 token 效率分析之外，也不通过筛选“收尾良好”的样本来人为修复数据。</p>
 
         <h2>三个未通过家族告诉了我们什么</h2>
         <p>前面的选型漏斗只概括了筛选结果。这里进一步把失败拆成四层：解析器是否正确、模型是否完成 reasoning-to-final、大小模型是否真的形成质量优势，以及推理预算/架构配置是否让比较失去可解释性。</p>
@@ -297,7 +297,7 @@
         <ol>
           <li><strong>先分开“跑完了”和“能测量”。</strong>覆盖完整不代表 final validity、token partition 与截断率合格。</li>
           <li><strong>用完整生成流和控制任务单测 parser。</strong>如果完整流能解析，而失败样本根本没有 final，根因通常在模型收尾而非抽取器。</li>
-          <li><strong>严格准确率保留，token 效率删失。</strong>缺失 final 应计为错误，但不能用其短 token 长度证明高效。</li>
+          <li><strong>保留严格准确率，排除不合格的 token 指标。</strong>缺失 final 应计为错误，但不能用其短 token 长度证明高效。</li>
           <li><strong>检查预算交互。</strong>至少比较多档 cap；只看 32K 无法区分能力差异与长推理未收尾。</li>
           <li><strong>不要把 MoE 总参数当作唯一尺度轴。</strong>同时控制或报告激活参数、路由与后训练差异。</li>
           <li><strong>保留真实反例。</strong>如果小模型在有效测量下确实更好，它应当限制结论，而不是被重新归类成“脏数据”。</li>
@@ -310,7 +310,7 @@
           <li><strong>这是有条件的家族内规律，不是参数规模定律。</strong>GPT-OSS 在 MATH500 上减少 50.6% 的可见推理，Qwen3.5 减少 18.7%，但这些结果不能外推为跨架构、跨训练配方的普适关系。</li>
           <li><strong>推理效率必须联合衡量质量、thinking tokens 与测量有效性。</strong>更短但没有完成 final 的响应不是高效；final validity、token partition 和截断率是指标的一部分，而不是事后清洗。</li>
           <li><strong>未进入主结果的家族分别揭示了测量失效、比较混杂和真实反例。</strong>“规模”只有在架构、后训练、MoE 激活规模和 tokenizer 足够可比时才是有意义的变量，不能通过筛掉反例制造整齐规律。</li>
-          <li><strong>可见 token 不等于总计算成本，当前前沿也只有有限分辨率。</strong>大模型可能生成更少 token，却仍有更高的单 token FLOPs、延迟或部署成本；现有实验只采样四档预算，部分 Qwen3.5 单元被删失，GPT-OSS high-effort 仍是辅助不完整切片。</li>
+          <li><strong>可见 token 不等于总计算成本，当前前沿也只有有限分辨率。</strong>大模型可能生成更少 token，却仍有更高的单 token FLOPs、延迟或部署成本；现有实验只采样四档预算，部分 Qwen3.5 单元未被纳入 token 效率分析，GPT-OSS high-effort 仍是辅助不完整切片。</li>
         </ul>
 
         <h2>这次验证的投入规模</h2>
