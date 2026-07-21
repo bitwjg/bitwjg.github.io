@@ -3,7 +3,7 @@
 <desc>Four-budget trajectories for small and large GPT-OSS and Qwen3.5 Dense models on MATH500, plus a focused GPT-OSS 120B diagnostic for accuracy and thinking tokens. Hollow points fail a measurement gate.</desc>
 <rect width="1100" height="1250" fill="#FBF8F1"/>
 <text x="70.0" y="58.0" fill="#243447" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Noto Sans CJK SC, sans-serif" font-size="31" font-weight="700" text-anchor="start">MATH500: quality vs visible thinking tokens</text>
-<text x="70.0" y="92.0" fill="#667085" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Noto Sans CJK SC, sans-serif" font-size="16" font-weight="400" text-anchor="start">Four budget trajectories (4K / 8K / 16K / 32K) | filled: gate-passing; hollow: descriptive only</text>
+<text x="70.0" y="92.0" fill="#667085" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Noto Sans CJK SC, sans-serif" font-size="16" font-weight="400" text-anchor="start">Four budget trajectories (4K / 8K / 16K / 32K) | vertical bars: problem-bootstrap 95% CI | n=500 problems</text>
 <line x1="70.0" y1="130.0" x2="112.0" y2="130.0" stroke="#2F6B9A" stroke-width="3" opacity="1"/>
 <circle cx="91.0" cy="130.0" r="7" fill="#2F6B9A" stroke="#2F6B9A" stroke-width="2"/>
 <text x="124.0" y="136.0" fill="#667085" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Noto Sans CJK SC, sans-serif" font-size="15" font-weight="400" text-anchor="start">smaller model</text>
@@ -45,22 +45,30 @@
 <line x1="511.9" y1="247.7" x2="692.8" y2="235.2" stroke="#2F6B9A" stroke-width="3" opacity="0.68"/>
 <line x1="692.8" y1="235.2" x2="839.7" y2="227.8" stroke="#2F6B9A" stroke-width="3" opacity="0.68"/>
 <line x1="839.7" y1="227.8" x2="928.2" y2="227.1" stroke="#2F6B9A" stroke-width="3" opacity="0.68"/>
+<line x1="511.9" y1="254.5" x2="511.9" y2="241.7" stroke="#2F6B9A" stroke-width="2" opacity="0.72"/><line x1="504.9" y1="254.5" x2="518.9" y2="254.5" stroke="#2F6B9A" stroke-width="2" opacity="0.72"/><line x1="504.9" y1="241.7" x2="518.9" y2="241.7" stroke="#2F6B9A" stroke-width="2" opacity="0.72"/>
 <circle cx="511.9" cy="247.7" r="8" fill="#FFFEFA" stroke="#8A5A20" stroke-width="2.8"/>
 <text x="511.9" y="268.7" fill="#2F6B9A" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Noto Sans CJK SC, sans-serif" font-size="13" font-weight="700" text-anchor="middle">4K</text>
+<line x1="692.8" y1="240.2" x2="692.8" y2="229.9" stroke="#2F6B9A" stroke-width="2" opacity="0.72"/><line x1="685.8" y1="240.2" x2="699.8" y2="240.2" stroke="#2F6B9A" stroke-width="2" opacity="0.72"/><line x1="685.8" y1="229.9" x2="699.8" y2="229.9" stroke="#2F6B9A" stroke-width="2" opacity="0.72"/>
 <circle cx="692.8" cy="235.2" r="8" fill="#2F6B9A" stroke="#2F6B9A" stroke-width="2.8"/>
 <text x="692.8" y="256.2" fill="#2F6B9A" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Noto Sans CJK SC, sans-serif" font-size="13" font-weight="700" text-anchor="middle">8K</text>
+<line x1="839.7" y1="232.2" x2="839.7" y2="223.8" stroke="#2F6B9A" stroke-width="2" opacity="0.72"/><line x1="832.7" y1="232.2" x2="846.7" y2="232.2" stroke="#2F6B9A" stroke-width="2" opacity="0.72"/><line x1="832.7" y1="223.8" x2="846.7" y2="223.8" stroke="#2F6B9A" stroke-width="2" opacity="0.72"/>
 <circle cx="839.7" cy="227.8" r="8" fill="#2F6B9A" stroke="#2F6B9A" stroke-width="2.8"/>
 <text x="839.7" y="248.8" fill="#2F6B9A" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Noto Sans CJK SC, sans-serif" font-size="13" font-weight="700" text-anchor="middle">16K</text>
+<line x1="928.2" y1="230.7" x2="928.2" y2="223.6" stroke="#2F6B9A" stroke-width="2" opacity="0.72"/><line x1="921.2" y1="230.7" x2="935.2" y2="230.7" stroke="#2F6B9A" stroke-width="2" opacity="0.72"/><line x1="921.2" y1="223.6" x2="935.2" y2="223.6" stroke="#2F6B9A" stroke-width="2" opacity="0.72"/>
 <circle cx="928.2" cy="227.1" r="8" fill="#2F6B9A" stroke="#2F6B9A" stroke-width="2.8"/>
 <text x="928.2" y="248.1" fill="#2F6B9A" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Noto Sans CJK SC, sans-serif" font-size="13" font-weight="700" text-anchor="middle">32K</text>
 <text x="529.9" y="234.7" fill="#2F6B9A" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Noto Sans CJK SC, sans-serif" font-size="15" font-weight="700" text-anchor="start">GPT-OSS 20B</text>
 <line x1="249.8" y1="231.2" x2="306.8" y2="224.3" stroke="#E8833A" stroke-width="3" opacity="0.68"/>
 <line x1="306.8" y1="224.3" x2="302.2" y2="223.1" stroke="#E8833A" stroke-width="3" opacity="0.68"/>
 <line x1="302.2" y1="223.1" x2="315.1" y2="223.2" stroke="#E8833A" stroke-width="3" opacity="0.68"/>
+<line x1="249.8" y1="236.0" x2="249.8" y2="226.8" stroke="#E8833A" stroke-width="2" opacity="0.72"/><line x1="242.8" y1="236.0" x2="256.8" y2="236.0" stroke="#E8833A" stroke-width="2" opacity="0.72"/><line x1="242.8" y1="226.8" x2="256.8" y2="226.8" stroke="#E8833A" stroke-width="2" opacity="0.72"/>
 <polygon points="249.8,222.2 258.8,231.2 249.8,240.2 240.8,231.2" fill="#E8833A" stroke="#E8833A" stroke-width="2.8"/>
 <text x="249.8" y="218.2" fill="#E8833A" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Noto Sans CJK SC, sans-serif" font-size="13" font-weight="700" text-anchor="middle">4K</text>
+<line x1="306.8" y1="227.7" x2="306.8" y2="221.4" stroke="#E8833A" stroke-width="2" opacity="0.72"/><line x1="299.8" y1="227.7" x2="313.8" y2="227.7" stroke="#E8833A" stroke-width="2" opacity="0.72"/><line x1="299.8" y1="221.4" x2="313.8" y2="221.4" stroke="#E8833A" stroke-width="2" opacity="0.72"/>
 <polygon points="306.8,215.3 315.8,224.3 306.8,233.3 297.8,224.3" fill="#E8833A" stroke="#E8833A" stroke-width="2.8"/>
+<line x1="302.2" y1="226.4" x2="302.2" y2="220.2" stroke="#E8833A" stroke-width="2" opacity="0.72"/><line x1="295.2" y1="226.4" x2="309.2" y2="226.4" stroke="#E8833A" stroke-width="2" opacity="0.72"/><line x1="295.2" y1="220.2" x2="309.2" y2="220.2" stroke="#E8833A" stroke-width="2" opacity="0.72"/>
 <polygon points="302.2,214.1 311.2,223.1 302.2,232.1 293.2,223.1" fill="#E8833A" stroke="#E8833A" stroke-width="2.8"/>
+<line x1="315.1" y1="226.5" x2="315.1" y2="220.3" stroke="#E8833A" stroke-width="2" opacity="0.72"/><line x1="308.1" y1="226.5" x2="322.1" y2="226.5" stroke="#E8833A" stroke-width="2" opacity="0.72"/><line x1="308.1" y1="220.3" x2="322.1" y2="220.3" stroke="#E8833A" stroke-width="2" opacity="0.72"/>
 <polygon points="315.1,214.2 324.1,223.2 315.1,232.2 306.1,223.2" fill="#E8833A" stroke="#E8833A" stroke-width="2.8"/>
 <text x="308.0" y="255.3" fill="#E8833A" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Noto Sans CJK SC, sans-serif" font-size="13" font-weight="700" text-anchor="middle">8K / 16K / 32K</text>
 <text x="349.1" y="216.2" fill="#E8833A" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Noto Sans CJK SC, sans-serif" font-size="15" font-weight="700" text-anchor="start">GPT-OSS 120B</text>
@@ -69,25 +77,29 @@
 <text x="140.0" y="552.0" fill="#667085" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Noto Sans CJK SC, sans-serif" font-size="13" font-weight="400" text-anchor="start">Focused scales separate overlapping readings; points are cell means, not evidence of a new micro-trend.</text>
 <text x="178.0" y="582.0" fill="#243447" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Noto Sans CJK SC, sans-serif" font-size="16" font-weight="700" text-anchor="start">avg@8 accuracy</text>
 <line x1="178.0" y1="715.0" x2="498.0" y2="715.0" stroke="#D9E0E8" stroke-width="1" opacity="1"/>
-<text x="168.0" y="719.0" fill="#667085" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Noto Sans CJK SC, sans-serif" font-size="12" font-weight="400" text-anchor="end">93.1%</text>
+<text x="168.0" y="719.0" fill="#667085" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Noto Sans CJK SC, sans-serif" font-size="12" font-weight="400" text-anchor="end">90.3%</text>
 <line x1="178.0" y1="657.5" x2="498.0" y2="657.5" stroke="#D9E0E8" stroke-width="1" opacity="1"/>
-<text x="168.0" y="661.5" fill="#667085" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Noto Sans CJK SC, sans-serif" font-size="12" font-weight="400" text-anchor="end">95.8%</text>
+<text x="168.0" y="661.5" fill="#667085" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Noto Sans CJK SC, sans-serif" font-size="12" font-weight="400" text-anchor="end">95.1%</text>
 <line x1="178.0" y1="600.0" x2="498.0" y2="600.0" stroke="#D9E0E8" stroke-width="1" opacity="1"/>
-<text x="168.0" y="604.0" fill="#667085" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Noto Sans CJK SC, sans-serif" font-size="12" font-weight="400" text-anchor="end">98.5%</text>
-<line x1="178.0" y1="687.8" x2="284.7" y2="636.4" stroke="#E8833A" stroke-width="3" opacity="0.8"/>
-<line x1="284.7" y1="636.4" x2="391.3" y2="627.2" stroke="#E8833A" stroke-width="3" opacity="0.8"/>
-<line x1="391.3" y1="627.2" x2="498.0" y2="628.3" stroke="#E8833A" stroke-width="3" opacity="0.8"/>
-<polygon points="178.0,679.8 186.0,687.8 178.0,695.8 170.0,687.8" fill="#E8833A" stroke="#E8833A" stroke-width="2.5"/>
-<text x="178.0" y="674.8" fill="#E8833A" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Noto Sans CJK SC, sans-serif" font-size="13" font-weight="700" text-anchor="middle">94.4%</text>
+<text x="168.0" y="604.0" fill="#667085" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Noto Sans CJK SC, sans-serif" font-size="12" font-weight="400" text-anchor="end">100.0%</text>
+<line x1="178.0" y1="666.1" x2="284.7" y2="638.1" stroke="#E8833A" stroke-width="3" opacity="0.8"/>
+<line x1="284.7" y1="638.1" x2="391.3" y2="633.1" stroke="#E8833A" stroke-width="3" opacity="0.8"/>
+<line x1="391.3" y1="633.1" x2="498.0" y2="633.7" stroke="#E8833A" stroke-width="3" opacity="0.8"/>
+<line x1="178.0" y1="685.9" x2="178.0" y2="648.1" stroke="#E8833A" stroke-width="2" opacity="0.72"/><line x1="171.0" y1="685.9" x2="185.0" y2="685.9" stroke="#E8833A" stroke-width="2" opacity="0.72"/><line x1="171.0" y1="648.1" x2="185.0" y2="648.1" stroke="#E8833A" stroke-width="2" opacity="0.72"/>
+<polygon points="178.0,658.1 186.0,666.1 178.0,674.1 170.0,666.1" fill="#E8833A" stroke="#E8833A" stroke-width="2.5"/>
+<text x="178.0" y="653.1" fill="#E8833A" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Noto Sans CJK SC, sans-serif" font-size="13" font-weight="700" text-anchor="middle">94.4%</text>
 <text x="178.0" y="739.0" fill="#667085" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Noto Sans CJK SC, sans-serif" font-size="13" font-weight="600" text-anchor="middle">4K</text>
-<polygon points="284.7,628.4 292.7,636.4 284.7,644.4 276.7,636.4" fill="#E8833A" stroke="#E8833A" stroke-width="2.5"/>
-<text x="284.7" y="657.4" fill="#E8833A" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Noto Sans CJK SC, sans-serif" font-size="13" font-weight="700" text-anchor="middle">96.8%</text>
+<line x1="284.7" y1="652.0" x2="284.7" y2="626.3" stroke="#E8833A" stroke-width="2" opacity="0.72"/><line x1="277.7" y1="652.0" x2="291.7" y2="652.0" stroke="#E8833A" stroke-width="2" opacity="0.72"/><line x1="277.7" y1="626.3" x2="291.7" y2="626.3" stroke="#E8833A" stroke-width="2" opacity="0.72"/>
+<polygon points="284.7,630.1 292.7,638.1 284.7,646.1 276.7,638.1" fill="#E8833A" stroke="#E8833A" stroke-width="2.5"/>
+<text x="284.7" y="659.1" fill="#E8833A" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Noto Sans CJK SC, sans-serif" font-size="13" font-weight="700" text-anchor="middle">96.8%</text>
 <text x="284.7" y="739.0" fill="#667085" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Noto Sans CJK SC, sans-serif" font-size="13" font-weight="600" text-anchor="middle">8K</text>
-<polygon points="391.3,619.2 399.3,627.2 391.3,635.2 383.3,627.2" fill="#E8833A" stroke="#E8833A" stroke-width="2.5"/>
-<text x="391.3" y="614.2" fill="#E8833A" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Noto Sans CJK SC, sans-serif" font-size="13" font-weight="700" text-anchor="middle">97.2%</text>
+<line x1="391.3" y1="646.6" x2="391.3" y2="621.3" stroke="#E8833A" stroke-width="2" opacity="0.72"/><line x1="384.3" y1="646.6" x2="398.3" y2="646.6" stroke="#E8833A" stroke-width="2" opacity="0.72"/><line x1="384.3" y1="621.3" x2="398.3" y2="621.3" stroke="#E8833A" stroke-width="2" opacity="0.72"/>
+<polygon points="391.3,625.1 399.3,633.1 391.3,641.1 383.3,633.1" fill="#E8833A" stroke="#E8833A" stroke-width="2.5"/>
+<text x="391.3" y="620.1" fill="#E8833A" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Noto Sans CJK SC, sans-serif" font-size="13" font-weight="700" text-anchor="middle">97.2%</text>
 <text x="391.3" y="739.0" fill="#667085" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Noto Sans CJK SC, sans-serif" font-size="13" font-weight="600" text-anchor="middle">16K</text>
-<polygon points="498.0,620.3 506.0,628.3 498.0,636.3 490.0,628.3" fill="#E8833A" stroke="#E8833A" stroke-width="2.5"/>
-<text x="498.0" y="649.3" fill="#E8833A" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Noto Sans CJK SC, sans-serif" font-size="13" font-weight="700" text-anchor="middle">97.2%</text>
+<line x1="498.0" y1="647.2" x2="498.0" y2="621.8" stroke="#E8833A" stroke-width="2" opacity="0.72"/><line x1="491.0" y1="647.2" x2="505.0" y2="647.2" stroke="#E8833A" stroke-width="2" opacity="0.72"/><line x1="491.0" y1="621.8" x2="505.0" y2="621.8" stroke="#E8833A" stroke-width="2" opacity="0.72"/>
+<polygon points="498.0,625.7 506.0,633.7 498.0,641.7 490.0,633.7" fill="#E8833A" stroke="#E8833A" stroke-width="2.5"/>
+<text x="498.0" y="654.7" fill="#E8833A" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Noto Sans CJK SC, sans-serif" font-size="13" font-weight="700" text-anchor="middle">97.2%</text>
 <text x="498.0" y="739.0" fill="#667085" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Noto Sans CJK SC, sans-serif" font-size="13" font-weight="600" text-anchor="middle">32K</text>
 <text x="640.0" y="582.0" fill="#243447" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Noto Sans CJK SC, sans-serif" font-size="16" font-weight="700" text-anchor="start">mean thinking tokens</text>
 <line x1="640.0" y1="715.0" x2="960.0" y2="715.0" stroke="#D9E0E8" stroke-width="1" opacity="1"/>
@@ -144,28 +156,36 @@
 <line x1="270.2" y1="1034.4" x2="512.8" y2="974.8" stroke="#2F6B9A" stroke-width="3" opacity="0.68"/>
 <line x1="512.8" y1="974.8" x2="775.4" y2="905.5" stroke="#2F6B9A" stroke-width="3" opacity="0.68"/>
 <line x1="775.4" y1="905.5" x2="928.2" y2="864.3" stroke="#2F6B9A" stroke-width="3" opacity="0.68"/>
+<line x1="270.2" y1="1044.4" x2="270.2" y2="1024.0" stroke="#2F6B9A" stroke-width="2" opacity="0.72"/><line x1="263.2" y1="1044.4" x2="277.2" y2="1044.4" stroke="#2F6B9A" stroke-width="2" opacity="0.72"/><line x1="263.2" y1="1024.0" x2="277.2" y2="1024.0" stroke="#2F6B9A" stroke-width="2" opacity="0.72"/>
 <circle cx="270.2" cy="1034.4" r="8" fill="#FFFEFA" stroke="#8A5A20" stroke-width="2.8"/>
 <text x="270.2" y="1055.4" fill="#2F6B9A" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Noto Sans CJK SC, sans-serif" font-size="13" font-weight="700" text-anchor="middle">4K</text>
+<line x1="512.8" y1="985.3" x2="512.8" y2="963.7" stroke="#2F6B9A" stroke-width="2" opacity="0.72"/><line x1="505.8" y1="985.3" x2="519.8" y2="985.3" stroke="#2F6B9A" stroke-width="2" opacity="0.72"/><line x1="505.8" y1="963.7" x2="519.8" y2="963.7" stroke="#2F6B9A" stroke-width="2" opacity="0.72"/>
 <circle cx="512.8" cy="974.8" r="8" fill="#FFFEFA" stroke="#8A5A20" stroke-width="2.8"/>
 <text x="512.8" y="995.8" fill="#2F6B9A" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Noto Sans CJK SC, sans-serif" font-size="13" font-weight="700" text-anchor="middle">8K</text>
+<line x1="775.4" y1="914.6" x2="775.4" y2="896.8" stroke="#2F6B9A" stroke-width="2" opacity="0.72"/><line x1="768.4" y1="914.6" x2="782.4" y2="914.6" stroke="#2F6B9A" stroke-width="2" opacity="0.72"/><line x1="768.4" y1="896.8" x2="782.4" y2="896.8" stroke="#2F6B9A" stroke-width="2" opacity="0.72"/>
 <circle cx="775.4" cy="905.5" r="8" fill="#FFFEFA" stroke="#8A5A20" stroke-width="2.8"/>
 <text x="775.4" y="926.5" fill="#2F6B9A" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Noto Sans CJK SC, sans-serif" font-size="13" font-weight="700" text-anchor="middle">16K</text>
+<line x1="928.2" y1="869.0" x2="928.2" y2="860.2" stroke="#2F6B9A" stroke-width="2" opacity="0.72"/><line x1="921.2" y1="869.0" x2="935.2" y2="869.0" stroke="#2F6B9A" stroke-width="2" opacity="0.72"/><line x1="921.2" y1="860.2" x2="935.2" y2="860.2" stroke="#2F6B9A" stroke-width="2" opacity="0.72"/>
 <circle cx="928.2" cy="864.3" r="8" fill="#2F6B9A" stroke="#2F6B9A" stroke-width="2.8"/>
 <text x="928.2" y="885.3" fill="#2F6B9A" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Noto Sans CJK SC, sans-serif" font-size="13" font-weight="700" text-anchor="middle">32K</text>
 <text x="913.2" y="881.3" fill="#2F6B9A" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Noto Sans CJK SC, sans-serif" font-size="15" font-weight="700" text-anchor="end">Qwen3.5 9B</text>
 <line x1="249.8" y1="1006.5" x2="460.8" y2="949.7" stroke="#E8833A" stroke-width="3" opacity="0.68"/>
 <line x1="460.8" y1="949.7" x2="660.3" y2="882.4" stroke="#E8833A" stroke-width="3" opacity="0.68"/>
 <line x1="660.3" y1="882.4" x2="742.3" y2="850.8" stroke="#E8833A" stroke-width="3" opacity="0.68"/>
+<line x1="249.8" y1="1017.6" x2="249.8" y2="996.1" stroke="#E8833A" stroke-width="2" opacity="0.72"/><line x1="242.8" y1="1017.6" x2="256.8" y2="1017.6" stroke="#E8833A" stroke-width="2" opacity="0.72"/><line x1="242.8" y1="996.1" x2="256.8" y2="996.1" stroke="#E8833A" stroke-width="2" opacity="0.72"/>
 <polygon points="249.8,997.5 258.8,1006.5 249.8,1015.5 240.8,1006.5" fill="#FFFEFA" stroke="#8A5A20" stroke-width="2.8"/>
 <text x="249.8" y="993.5" fill="#E8833A" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Noto Sans CJK SC, sans-serif" font-size="13" font-weight="700" text-anchor="middle">4K</text>
+<line x1="460.8" y1="960.9" x2="460.8" y2="938.9" stroke="#E8833A" stroke-width="2" opacity="0.72"/><line x1="453.8" y1="960.9" x2="467.8" y2="960.9" stroke="#E8833A" stroke-width="2" opacity="0.72"/><line x1="453.8" y1="938.9" x2="467.8" y2="938.9" stroke="#E8833A" stroke-width="2" opacity="0.72"/>
 <polygon points="460.8,940.7 469.8,949.7 460.8,958.7 451.8,949.7" fill="#FFFEFA" stroke="#8A5A20" stroke-width="2.8"/>
 <text x="460.8" y="936.7" fill="#E8833A" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Noto Sans CJK SC, sans-serif" font-size="13" font-weight="700" text-anchor="middle">8K</text>
+<line x1="660.3" y1="889.7" x2="660.3" y2="874.9" stroke="#E8833A" stroke-width="2" opacity="0.72"/><line x1="653.3" y1="889.7" x2="667.3" y2="889.7" stroke="#E8833A" stroke-width="2" opacity="0.72"/><line x1="653.3" y1="874.9" x2="667.3" y2="874.9" stroke="#E8833A" stroke-width="2" opacity="0.72"/>
 <polygon points="660.3,873.4 669.3,882.4 660.3,891.4 651.3,882.4" fill="#FFFEFA" stroke="#8A5A20" stroke-width="2.8"/>
 <text x="660.3" y="869.4" fill="#E8833A" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Noto Sans CJK SC, sans-serif" font-size="13" font-weight="700" text-anchor="middle">16K</text>
+<line x1="742.3" y1="853.8" x2="742.3" y2="848.0" stroke="#E8833A" stroke-width="2" opacity="0.72"/><line x1="735.3" y1="853.8" x2="749.3" y2="853.8" stroke="#E8833A" stroke-width="2" opacity="0.72"/><line x1="735.3" y1="848.0" x2="749.3" y2="848.0" stroke="#E8833A" stroke-width="2" opacity="0.72"/>
 <polygon points="742.3,841.8 751.3,850.8 742.3,859.8 733.3,850.8" fill="#E8833A" stroke="#E8833A" stroke-width="2.8"/>
 <text x="742.3" y="837.8" fill="#E8833A" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Noto Sans CJK SC, sans-serif" font-size="13" font-weight="700" text-anchor="middle">32K</text>
 <text x="757.3" y="845.8" fill="#E8833A" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Noto Sans CJK SC, sans-serif" font-size="15" font-weight="700" text-anchor="start">Qwen3.5 27B</text>
 <text x="70.0" y="1155.0" fill="#243447" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Noto Sans CJK SC, sans-serif" font-size="17" font-weight="600" text-anchor="start">Reading: GPT-OSS 120B plateaus near 8K, while Qwen3.5 quality keeps rising with budget.</text>
-<text x="70.0" y="1188.0" fill="#667085" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Noto Sans CJK SC, sans-serif" font-size="14" font-weight="400" text-anchor="start">Note: hollow points retain strict accuracy but are censored from token-efficiency claims; family panels use separate x scales.</text>
-<text x="70.0" y="1216.0" fill="#667085" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Noto Sans CJK SC, sans-serif" font-size="13" font-weight="400" text-anchor="start">The diagnostic and overview use the same K=8 aggregate cells.</text>
+<text x="70.0" y="1188.0" fill="#667085" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Noto Sans CJK SC, sans-serif" font-size="14" font-weight="400" text-anchor="start">Note: filled points pass the gates; hollow points retain strict accuracy but are excluded from token-efficiency claims; x scales are family-specific.</text>
+<text x="70.0" y="1216.0" fill="#667085" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Noto Sans CJK SC, sans-serif" font-size="13" font-weight="400" text-anchor="start">Intervals resample benchmark problems and keep all K=8 rollouts for each sampled problem together.</text>
 </svg>

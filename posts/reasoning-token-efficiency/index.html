@@ -8,7 +8,7 @@
   <title>Do Larger Reasoning Models Use Tokens More Efficiently? | Jingang Wang</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Serif:wght@400;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600&amp;family=IBM+Plex+Serif:wght@400;600&amp;display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/assets/style.css?v=20260720" />
 </head>
 <body>
@@ -87,9 +87,21 @@
           <div><strong>4</strong><span>budgets</span></div>
           <div><strong>8</strong><span>rollouts</span></div>
         </div>
+        <div class="table-wrap">
+          <table class="post-table">
+            <thead><tr><th>Task</th><th>Independent problems n</th><th>Rollouts per problem</th></tr></thead>
+            <tbody>
+              <tr><td>MATH500</td><td>500</td><td>8</td></tr>
+              <tr><td>GPQA-Diamond</td><td>198</td><td>8</td></tr>
+              <tr><td>AIME 2024</td><td>30</td><td>8</td></tr>
+              <tr><td>AIME 2025</td><td>30</td><td>8</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>Inference treats the <strong>problem</strong> as the independent sampling unit. The paired 95% intervals use 2,000 problem-bootstrap resamples; whenever a problem is sampled, all K=8 rollouts for both model sizes are kept together. K=8 reduces within-problem decoding noise, but AIME still has an effective benchmark sample size of 30 rather than 240.</p>
         <p>GPT-OSS high-effort is treated only as an auxiliary analysis and does not gate the primary conclusion; the other candidate families are retained in the failure diagnostics below.</p>
         <p>Quality is measured primarily by average accuracy over eight rollouts (<code>avg@8</code>). <code>pass@8</code> is auxiliary. We separately count thinking tokens, answer tokens, and total generated tokens.</p>
-        <div class="method-note"><strong>Measurement gate.</strong> Strict accuracy always counts a missing or unparsable final answer as wrong. A token-efficiency comparison is admitted only when final validity and thinking/answer partition validity are both at least 95%. A 32K cell must also truncate no more than 5% of the time. Failed cells retain strict accuracy but are censored from token-efficiency claims.</div>
+        <div class="method-note"><strong>Measurement gate.</strong> Strict accuracy always counts a missing or unparsable final answer as wrong. A token-efficiency comparison is admitted only when final validity and thinking/answer partition validity are both at least 95%. A 32K cell must also truncate no more than 5% of the time. Failed cells retain strict accuracy but are excluded from token-efficiency inference.</div>
 
         <h2>What the final aggregate says</h2>
         <p>The result is family-conditional, not universal.</p>
@@ -102,13 +114,29 @@
             </tbody>
           </table>
         </div>
+        <p>The table below reports the paired 32K <code>avg@8</code> effect, defined as larger minus smaller. An interval excluding zero supports the accuracy direction over the observed benchmark-problem distribution. “Ineligible” limits token-efficiency inference only; strict accuracy and its uncertainty are retained.</p>
+        <div class="table-wrap">
+          <table class="post-table">
+            <thead><tr><th>Family</th><th>Task</th><th>n</th><th><code>avg@8</code> difference</th><th>Paired problem-bootstrap 95% CI</th><th>Token-efficiency gate</th></tr></thead>
+            <tbody>
+              <tr><td>GPT-OSS</td><td>MATH500</td><td>500</td><td>+1.35 pp</td><td>[+0.60, +2.18] pp</td><td>eligible</td></tr>
+              <tr><td>GPT-OSS</td><td>GPQA-Diamond</td><td>198</td><td>+6.25 pp</td><td>[+3.41, +9.34] pp</td><td>eligible</td></tr>
+              <tr><td>GPT-OSS</td><td>AIME 2024</td><td>30</td><td>−2.92 pp</td><td>[−8.33, +2.50] pp</td><td>eligible</td></tr>
+              <tr><td>GPT-OSS</td><td>AIME 2025</td><td>30</td><td>+9.17 pp</td><td>[+3.75, +15.00] pp</td><td>ineligible</td></tr>
+              <tr><td>Qwen3.5 Dense</td><td>MATH500</td><td>500</td><td>+4.68 pp</td><td>[+3.65, +5.73] pp</td><td>eligible</td></tr>
+              <tr><td>Qwen3.5 Dense</td><td>GPQA-Diamond</td><td>198</td><td>+8.14 pp</td><td>[+5.49, +10.98] pp</td><td>ineligible</td></tr>
+              <tr><td>Qwen3.5 Dense</td><td>AIME 2024</td><td>30</td><td>+8.33 pp</td><td>[+3.33, +14.17] pp</td><td>ineligible</td></tr>
+              <tr><td>Qwen3.5 Dense</td><td>AIME 2025</td><td>30</td><td>+15.83 pp</td><td>[+8.75, +23.75] pp</td><td>ineligible</td></tr>
+            </tbody>
+          </table>
+        </div>
         <figure class="research-chart research-chart--dense">
-          <img src="/assets/quality-token-math500-all-budgets-en.svg" alt="MATH500 quality versus visible thinking tokens across 4K, 8K, 16K, and 32K budgets for GPT-OSS and Qwen3.5." width="1100" height="1250" loading="lazy">
-          <figcaption><strong>Figure 2.</strong> The Josh McGrath-style two-dimensional view extended across 4K, 8K, 16K, and 32K budgets on MATH500. Each family has its own thinking-token x-axis, so absolute lengths are not compared across tokenizers. GPT-OSS 120B is already near its accuracy plateau around 8K; the focused middle panel therefore separates its four <code>avg@8</code> and mean-thinking-token readings without interpreting small within-plateau fluctuations as a new trend. Qwen3.5 retains a clearly rising budget trajectory. Hollow points retain strict accuracy but are censored from token-efficiency claims.</figcaption>
+          <img src="/assets/quality-token-math500-all-budgets-en.svg?v=20260721" alt="MATH500 quality versus visible thinking tokens across 4K, 8K, 16K, and 32K budgets for GPT-OSS and Qwen3.5, with problem-bootstrap 95% confidence intervals." width="1100" height="1250" loading="lazy">
+          <figcaption><strong>Figure 2.</strong> The Josh McGrath-style two-dimensional view extended across 4K, 8K, 16K, and 32K budgets on MATH500. Vertical bars are problem-bootstrap 95% intervals over 500 problems, keeping all K=8 rollouts for each sampled problem together. Each family has its own thinking-token x-axis, so absolute lengths are not compared across tokenizers. GPT-OSS 120B is already near its accuracy plateau around 8K; the focused middle panel separates its overlapping readings. Qwen3.5 retains a clearly rising budget trajectory. Hollow points retain strict accuracy but are excluded from token-efficiency claims.</figcaption>
         </figure>
         <figure class="research-chart research-chart--dense">
-          <img src="/assets/quality-token-gpqa-all-budgets-en.svg" alt="GPQA-Diamond quality versus visible thinking tokens across 4K, 8K, 16K, and 32K budgets for GPT-OSS and Qwen3.5." width="1100" height="1250" loading="lazy">
-          <figcaption><strong>Figure 3.</strong> Four-budget trajectories on GPQA-Diamond. GPT-OSS 120B enters a 71.4%–73.1% plateau from 8K onward while mean thinking tokens move only from 1.73K to 1.80K; the focused panel makes those overlapping readings legible. At 32K, GPT-OSS uses 60.9% fewer thinking tokens than 20B while accuracy rises from 66.9% to 73.1%. Qwen3.5 shows a clear four-budget quality climb, but every GPQA cell fails a measurement gate, so the entire trajectory is descriptive rather than admissible token-efficiency evidence.</figcaption>
+          <img src="/assets/quality-token-gpqa-all-budgets-en.svg?v=20260721" alt="GPQA-Diamond quality versus visible thinking tokens across 4K, 8K, 16K, and 32K budgets for GPT-OSS and Qwen3.5, with problem-bootstrap 95% confidence intervals." width="1100" height="1250" loading="lazy">
+          <figcaption><strong>Figure 3.</strong> Four-budget trajectories on GPQA-Diamond. Vertical bars are problem-bootstrap 95% intervals over 198 problems. GPT-OSS 120B enters a 71.4%–73.1% plateau from 8K onward; the focused panel makes the overlapping readings legible. At 32K, GPT-OSS uses 60.9% fewer thinking tokens than 20B while accuracy rises from 66.9% to 73.1%; the paired accuracy-difference interval is [+3.41, +9.34] percentage points. Qwen3.5 shows a clear four-budget quality climb, but every GPQA cell fails a measurement gate, so the trajectory remains strict-accuracy description rather than admissible token-efficiency evidence.</figcaption>
         </figure>
         <p><strong>Relation to the official GPT-OSS model card.</strong> Its Figure 3 already plots 20B/120B quality–<code>CoT+Answer</code> curves on AIME 2025 and GPQA-Diamond. The plotted points align with Table 3's <code>with tools</code> rows and primarily demonstrate test-time scaling as reasoning effort increases. The closest comparison to our no-tools, fixed-medium, hard-cap protocol is instead Table 3's <code>medium / no tools</code> column: GPQA-Diamond is <strong>66.0%→73.1%</strong>, nearly identical to our <strong>66.9%→73.1%</strong>; AIME 2025 is <strong>72.1%→80.0%</strong>, directionally consistent with our <strong>74.2%→83.3%</strong>. MATH500 does not appear in the model card.</p>
         <p>We therefore do not claim the two-dimensional presentation or the basic GPT-OSS direction as a first discovery. The more accurate contribution is a controlled replication under fixed effort, K=8, and explicit measurement gates, extended with thinking-only tokens, MATH500, and a second family, Qwen3.5. The official numbers serve as external consistency evidence; they are not pooled with our rows, confidence intervals, or acceptance statistics.</p>
@@ -116,19 +144,19 @@
         <h3>GPT-OSS: the clearest positive result</h3>
         <p>In all five eligible fixed-budget comparisons, GPT-OSS 120B uses fewer thinking tokens than 20B. In four, it is also more accurate. All four quality-matched frontier points show token savings.</p>
         <ul>
-          <li>MATH500: <strong>95.8% → 97.2%</strong>, with <strong>50.6% fewer</strong> thinking tokens.</li>
-          <li>GPQA-Diamond: <strong>66.9% → 73.1%</strong>, with <strong>60.9% fewer</strong> thinking tokens.</li>
-          <li>AIME 2025: <strong>74.2% → 83.3%</strong>, with <strong>48.5% fewer</strong> thinking tokens.</li>
+          <li>MATH500 improves from <strong>95.8% to 97.2%</strong>. The paired effect is <strong>+1.35 pp</strong> (95% CI <strong>[+0.60, +2.18]</strong>), while mean thinking falls by <strong>849 tokens</strong> (95% CI <strong>[−1,028, −685]</strong>).</li>
+          <li>GPQA-Diamond improves from <strong>66.9% to 73.1%</strong>. The paired effect is <strong>+6.25 pp</strong> (95% CI <strong>[+3.41, +9.34]</strong>), while mean thinking falls by <strong>2,804 tokens</strong> (95% CI <strong>[−3,289, −2,323]</strong>).</li>
+          <li>AIME 2025 improves from <strong>74.2% to 83.3%</strong>, a <strong>+9.17 pp</strong> effect (95% CI <strong>[+3.75, +15.00]</strong>). The cell is nevertheless ineligible for token-efficiency inference, so only strict accuracy is retained.</li>
         </ul>
-        <p>AIME 2024 is a counterexample: thinking falls by 50.2%, but accuracy drops from 84.6% to 81.7%. Scale does not dominate every task.</p>
+        <p>AIME 2024 has a directional reversal in the point estimate: accuracy falls from <strong>84.6% to 81.7%</strong>. But the paired <strong>−2.92 pp</strong> effect has a 95% CI of <strong>[−8.33, +2.50]</strong>, and an exact paired sign-flip test is also non-significant (two-sided <code>p=0.383</code>). We therefore treat it as a statistically inconclusive deviation, not an established counterexample. The thinking-token reduction is more stable: a mean difference of <strong>−4,252</strong>, with a 95% CI of <strong>[−6,071, −2,663]</strong>.</p>
 
         <h3>Qwen3.5: positive, but narrower</h3>
-        <p>On MATH500 at 32K, Qwen3.5 27B improves from <strong>93.3% to 98.0%</strong> while using <strong>18.7% fewer thinking tokens</strong> and <strong>18.7% fewer total tokens</strong> than 9B.</p>
-        <p>AIME accuracy also favors the larger model—70.8% to 79.2% on AIME 2024 and 62.1% to 77.9% on AIME 2025—but those cells fail final-validity or truncation gates. They remain strict-accuracy evidence and are excluded from the uncensored token-efficiency claim.</p>
+        <p>On MATH500 at 32K, Qwen3.5 27B improves from <strong>93.3% to 98.0%</strong>. The paired effect is <strong>+4.68 pp</strong> (95% CI <strong>[+3.65, +5.73]</strong>), while mean thinking falls by <strong>1,949 tokens</strong> (95% CI <strong>[−2,155, −1,752]</strong>), corresponding to an <strong>18.7%</strong> point estimate.</p>
+        <p>GPQA-Diamond strict accuracy also rises from <strong>74.1% to 82.2%</strong>, a paired <strong>+8.14 pp</strong> effect (95% CI <strong>[+5.49, +10.98]</strong>). AIME 2024 and AIME 2025 have effects of <strong>+8.33 pp</strong> (95% CI <strong>[+3.33, +14.17]</strong>) and <strong>+15.83 pp</strong> (95% CI <strong>[+8.75, +23.75]</strong>). These GPQA/AIME cells fail a final-validity or truncation gate, so they remain strict-accuracy observations and are excluded from token-efficiency inference.</p>
 
         <h2>The parser question</h2>
         <p>Qwen3.5's AIME gate failures could initially be mistaken for a parser problem. Artifact audits show that the thinking/answer partition is valid; the dominant failure occurs during the reasoning-to-final transition, when long reasoning consumes the budget before a terminal answer is emitted.</p>
-        <p>Increasing the sample count under the same configuration would not remove this systematic finalization behavior. We therefore kept strict accuracy, censored token-efficiency claims where required, and avoided “repairing” the dataset by selecting only well-finalized traces.</p>
+        <p>Increasing the sample count under the same configuration would not remove this systematic finalization behavior. We therefore kept strict accuracy, excluded token-efficiency claims where required, and avoided “repairing” the dataset by selecting only well-finalized traces.</p>
 
         <h2>What the three ineligible families taught us</h2>
         <p>The earlier screening funnel summarized the outcome. Here we separate four diagnostic layers: whether the parser worked, whether the model completed the reasoning-to-final transition, whether scale produced a real quality advantage, and whether architecture or inference settings made the comparison uninterpretable.</p>
@@ -161,12 +189,12 @@
         <p>Exclusion from the main result does not mean experimental failure: it may indicate invalid measurement, an unidentifiable comparison, or a genuine counterexample.</p>
 
         <h2>Takeaways: what the experiment supports—and what it does not</h2>
-        <blockquote>Within some controlled model families, a larger model can achieve equal or better quality with fewer visible reasoning tokens. The evidence is strong for GPT-OSS and directionally consistent but narrower for Qwen3.5.</blockquote>
+        <blockquote>Within some controlled model families, a larger model can achieve equal or better quality with fewer visible reasoning tokens. The confidence intervals support GPT-OSS on MATH500 and GPQA-Diamond and Qwen3.5 on MATH500; the admissible Qwen3.5 scope is narrower.</blockquote>
         <ul>
-          <li><strong>This is a conditional within-family pattern, not a law of parameter scale.</strong> Visible reasoning falls 50.6% for GPT-OSS on MATH500 and 18.7% for Qwen3.5, but those results do not establish a universal relationship across architectures or training recipes.</li>
+          <li><strong>This is a conditional within-family pattern, not a law of parameter scale.</strong> The supported 32K accuracy effects are +1.35 pp for GPT-OSS MATH500, +6.25 pp for GPT-OSS GPQA, and +4.68 pp for Qwen3.5 MATH500, while visible thinking also falls. These results do not establish a universal relationship across architectures or training recipes.</li>
           <li><strong>Reasoning efficiency must combine quality, thinking tokens, and measurement validity.</strong> A shorter response that never reaches a valid final answer is not efficient. Final validity, token partitioning, and truncation are part of the metric, not post-hoc cleanup.</li>
           <li><strong>Families outside the main result reveal measurement failure, comparison confounding, and genuine counterexamples.</strong> “Scale” is meaningful only when architecture, post-training, active MoE scale, and tokenizer are sufficiently comparable; counterexamples should not be filtered away to manufacture a clean law.</li>
-          <li><strong>Visible tokens are not total compute, and the present frontier has finite resolution.</strong> A larger model may generate fewer tokens while costing more per token in FLOPs, latency, or deployment expense. The study samples four budgets, censors some Qwen3.5 cells, and retains GPT-OSS high-effort only as an incomplete auxiliary slice.</li>
+          <li><strong>Uncertainty matters most on small benchmarks.</strong> AIME has only 30 independent problems; K=8 stabilizes each problem estimate but does not turn it into 240 independent items. GPT-OSS AIME 2024 is therefore an inconclusive deviation, not an established counterexample. Visible tokens also remain different from total compute.</li>
         </ul>
 
         <h2>Research scale</h2>
@@ -226,6 +254,18 @@
           <div><strong>4</strong><span>档预算</span></div>
           <div><strong>8</strong><span>次 rollout</span></div>
         </div>
+        <div class="table-wrap">
+          <table class="post-table">
+            <thead><tr><th>任务</th><th>独立题目数 n</th><th>每题 rollout</th></tr></thead>
+            <tbody>
+              <tr><td>MATH500</td><td>500</td><td>8</td></tr>
+              <tr><td>GPQA-Diamond</td><td>198</td><td>8</td></tr>
+              <tr><td>AIME 2024</td><td>30</td><td>8</td></tr>
+              <tr><td>AIME 2025</td><td>30</td><td>8</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>统计推断把<strong>题目</strong>作为独立抽样单位。95% 区间采用 2,000 次按题配对 bootstrap；每次抽中一道题时，会同时保留大小模型在该题上的全部 K=8 rollouts。K=8 能降低题内解码噪声，但 AIME 的有效基准样本量仍是 30，而不是 240。</p>
         <p>GPT-OSS high-effort 仅作为辅助分析，不参与主结论门禁；其他候选家族则保留在后文的失败诊断中。</p>
         <p>质量指标以 8 次 rollout 的平均准确率 <code>avg@8</code> 为主，<code>pass@8</code> 为辅助。token 成本被拆成 thinking、answer 和 total generated tokens。</p>
         <div class="method-note"><strong>测量门禁。</strong>严格准确率始终把缺失或无法解析的最终答案计为错误。token 效率比较只有在最终答案有效率和 thinking/answer 分区有效率都至少达到 95% 时才会被采纳；32K 单元的截断率还必须不超过 5%。未通过的单元保留严格准确率，但排除在 token 效率分析之外。</div>
@@ -241,13 +281,29 @@
             </tbody>
           </table>
         </div>
+        <p>下表给出 32K 下“较大模型减较小模型”的配对 <code>avg@8</code> 效应。区间不跨 0，表示在当前题目分布上准确率方向获得统计支持。“不合格”只限制 token 效率推断；严格准确率及其不确定性仍然保留。</p>
+        <div class="table-wrap">
+          <table class="post-table">
+            <thead><tr><th>家族</th><th>任务</th><th>n</th><th><code>avg@8</code> 差值</th><th>按题配对 95% CI</th><th>token 效率门禁</th></tr></thead>
+            <tbody>
+              <tr><td>GPT-OSS</td><td>MATH500</td><td>500</td><td>+1.35 pp</td><td>[+0.60, +2.18] pp</td><td>合格</td></tr>
+              <tr><td>GPT-OSS</td><td>GPQA-Diamond</td><td>198</td><td>+6.25 pp</td><td>[+3.41, +9.34] pp</td><td>合格</td></tr>
+              <tr><td>GPT-OSS</td><td>AIME 2024</td><td>30</td><td>−2.92 pp</td><td>[−8.33, +2.50] pp</td><td>合格</td></tr>
+              <tr><td>GPT-OSS</td><td>AIME 2025</td><td>30</td><td>+9.17 pp</td><td>[+3.75, +15.00] pp</td><td>不合格</td></tr>
+              <tr><td>Qwen3.5 Dense</td><td>MATH500</td><td>500</td><td>+4.68 pp</td><td>[+3.65, +5.73] pp</td><td>合格</td></tr>
+              <tr><td>Qwen3.5 Dense</td><td>GPQA-Diamond</td><td>198</td><td>+8.14 pp</td><td>[+5.49, +10.98] pp</td><td>不合格</td></tr>
+              <tr><td>Qwen3.5 Dense</td><td>AIME 2024</td><td>30</td><td>+8.33 pp</td><td>[+3.33, +14.17] pp</td><td>不合格</td></tr>
+              <tr><td>Qwen3.5 Dense</td><td>AIME 2025</td><td>30</td><td>+15.83 pp</td><td>[+8.75, +23.75] pp</td><td>不合格</td></tr>
+            </tbody>
+          </table>
+        </div>
         <figure class="research-chart research-chart--dense">
-          <img src="/assets/quality-token-math500-all-budgets-zh.svg" alt="MATH500 四档预算下 GPT-OSS 与 Qwen3.5 的质量和可见 thinking tokens 二维图。" width="1100" height="1250" loading="lazy">
-          <figcaption><strong>图 2。</strong>把 Josh McGrath 提到的二维评价方式扩展到 MATH500 的 4K、8K、16K 和 32K 四档预算。两个家族各自使用独立的 thinking-token 横轴，不跨 tokenizer 比较绝对长度。GPT-OSS 120B 在 8K 左右已经进入准确率平台，因此中间的局部诊断面板分开标出四档 <code>avg@8</code> 与平均 thinking tokens；它是读数放大镜，不把平台内的小幅波动解释成新趋势。Qwen3.5 的预算轨迹则仍清晰向右上方延伸。空心点表示该预算单元只保留严格准确率，不进入 token-efficiency 主结论。</figcaption>
+          <img src="/assets/quality-token-math500-all-budgets-zh.svg?v=20260721" alt="MATH500 四档预算下 GPT-OSS 与 Qwen3.5 的质量和可见 thinking tokens 二维图，含按题 bootstrap 95% 置信区间。" width="1100" height="1250" loading="lazy">
+          <figcaption><strong>图 2。</strong>把 Josh McGrath 提到的二维评价方式扩展到 MATH500 的 4K、8K、16K 和 32K 四档预算。竖向误差线是基于 500 道题的 bootstrap 95% 区间；每次抽样保留该题的全部 K=8 rollouts。两个家族各自使用独立的 thinking-token 横轴，不跨 tokenizer 比较绝对长度。GPT-OSS 120B 在 8K 左右已进入准确率平台，中间面板用于分开重叠读数。Qwen3.5 的预算轨迹仍清晰上升。空心点只保留严格准确率，不进入 token 效率结论。</figcaption>
         </figure>
         <figure class="research-chart research-chart--dense">
-          <img src="/assets/quality-token-gpqa-all-budgets-zh.svg" alt="GPQA-Diamond 四档预算下 GPT-OSS 与 Qwen3.5 的质量和可见 thinking tokens 二维图。" width="1100" height="1250" loading="lazy">
-          <figcaption><strong>图 3。</strong>GPQA-Diamond 的四档预算轨迹。GPT-OSS 120B 从 8K 起进入 71.4%–73.1% 的平台区，平均 thinking tokens 只从 1.73K 增至 1.80K；局部面板让这些重叠读数可辨。到 32K 时，GPT-OSS 相比 20B 少用 60.9% thinking tokens，准确率从 66.9% 提升到 73.1%。Qwen3.5 的四档质量爬升清晰可见，但所有 GPQA 单元都没有通过测量门禁，因此整条轨迹只作描述，不构成可采纳的 token-efficiency 证据。</figcaption>
+          <img src="/assets/quality-token-gpqa-all-budgets-zh.svg?v=20260721" alt="GPQA-Diamond 四档预算下 GPT-OSS 与 Qwen3.5 的质量和可见 thinking tokens 二维图，含按题 bootstrap 95% 置信区间。" width="1100" height="1250" loading="lazy">
+          <figcaption><strong>图 3。</strong>GPQA-Diamond 的四档预算轨迹。竖向误差线是基于 198 道题的 bootstrap 95% 区间。GPT-OSS 120B 从 8K 起进入 71.4%–73.1% 的平台区，局部面板让重叠读数可辨。到 32K 时，GPT-OSS 相比 20B 少用 60.9% thinking tokens，准确率从 66.9% 提升到 73.1%；配对准确率差值的 95% CI 为 [+3.41, +9.34] 个百分点。Qwen3.5 的质量爬升清晰可见，但所有 GPQA 单元都未通过测量门禁，因此整条轨迹只作严格准确率描述。</figcaption>
         </figure>
         <p><strong>与官方 GPT-OSS model card 的关系。</strong>官方图 3 已经在 AIME 2025 和 GPQA-Diamond 上画过 20B/120B 的质量—<code>CoT+Answer</code> 曲线；图中点位与表 3 的 <code>with tools</code> 结果一致，主要用于说明提高 reasoning effort 带来的 test-time scaling。与我们无工具、固定 medium effort、四档硬预算的设置最接近的是表 3 的 <code>medium / no tools</code>：GPQA-Diamond 为 <strong>66.0%→73.1%</strong>，与我们的 <strong>66.9%→73.1%</strong> 几乎一致；AIME 2025 为 <strong>72.1%→80.0%</strong>，也与我们的 <strong>74.2%→83.3%</strong> 同向。MATH500 没有出现在 model card 中。</p>
         <p>因此，我们不把二维图或 GPT-OSS 上的基本方向主张为首次发现。更准确的定位是：对官方先验做固定策略、K=8 和测量门禁下的受控复验，并用 thinking-only token、MATH500 与 Qwen3.5 把证据扩展到官方 model card 没有覆盖的分析口径和模型家族。官方结果只作为外部一致性证据，不与我们的实验行数、置信区间或验收统计合并。</p>
@@ -255,15 +311,15 @@
         <h3>GPT-OSS：最清晰的正向结果</h3>
         <p>在 5 个通过门禁的固定预算比较中，GPT-OSS 120B 的 thinking tokens 全部少于 20B；其中 4 个单元同时具有更高准确率。4 个等质量前沿点也全部显示 token 节省。</p>
         <ul>
-          <li>MATH500：<strong>95.8% → 97.2%</strong>，thinking tokens 减少 <strong>50.6%</strong>；</li>
-          <li>GPQA-Diamond：<strong>66.9% → 73.1%</strong>，thinking tokens 减少 <strong>60.9%</strong>；</li>
-          <li>AIME 2025：<strong>74.2% → 83.3%</strong>，thinking tokens 减少 <strong>48.5%</strong>。</li>
+          <li>MATH500 从 <strong>95.8% 提升到 97.2%</strong>，配对效应为 <strong>+1.35 pp</strong>（95% CI <strong>[+0.60, +2.18]</strong>）；平均 thinking 减少 <strong>849 tokens</strong>（95% CI <strong>[−1,028, −685]</strong>）。</li>
+          <li>GPQA-Diamond 从 <strong>66.9% 提升到 73.1%</strong>，配对效应为 <strong>+6.25 pp</strong>（95% CI <strong>[+3.41, +9.34]</strong>）；平均 thinking 减少 <strong>2,804 tokens</strong>（95% CI <strong>[−3,289, −2,323]</strong>）。</li>
+          <li>AIME 2025 从 <strong>74.2% 提升到 83.3%</strong>，配对效应为 <strong>+9.17 pp</strong>（95% CI <strong>[+3.75, +15.00]</strong>）。但该单元未通过 token 效率门禁，因此只保留严格准确率结论。</li>
         </ul>
-        <p>AIME 2024 构成一个反例：thinking tokens 虽然减少了 50.2%，准确率却从 84.6% 降到 81.7%。规模并不会在每个任务上都形成支配。</p>
+        <p>AIME 2024 的点估计出现方向性反转：准确率从 <strong>84.6% 降到 81.7%</strong>。但配对效应 <strong>−2.92 pp</strong> 的 95% CI 为 <strong>[−8.33, +2.50]</strong>，精确配对符号翻转检验也不显著（双侧 <code>p=0.383</code>）。因此我们把它视为统计上尚不确定的偏离，而不是已确立的反例。thinking-token 减少更稳定：平均差值 <strong>−4,252</strong>，95% CI 为 <strong>[−6,071, −2,663]</strong>。</p>
 
         <h3>Qwen3.5：方向一致，但证据更窄</h3>
-        <p>在 MATH500 的 32K 设置下，Qwen3.5 27B 的准确率从 <strong>93.3% 提升到 98.0%</strong>，同时比 9B 少用 <strong>18.7% thinking tokens</strong> 和 <strong>18.7% total tokens</strong>。</p>
-        <p>AIME 的准确率同样更偏向大模型：AIME 2024 从 70.8% 提升到 79.2%，AIME 2025 从 62.1% 提升到 77.9%。但这些单元没有通过最终答案有效率或截断率门禁，因此仍是有效的严格准确率结果，却不进入 token 效率结论。</p>
+        <p>在 MATH500 的 32K 设置下，Qwen3.5 27B 的准确率从 <strong>93.3% 提升到 98.0%</strong>。配对效应为 <strong>+4.68 pp</strong>（95% CI <strong>[+3.65, +5.73]</strong>）；平均 thinking 减少 <strong>1,949 tokens</strong>（95% CI <strong>[−2,155, −1,752]</strong>），点估计降幅为 <strong>18.7%</strong>。</p>
+        <p>GPQA-Diamond 的严格准确率也从 <strong>74.1% 提升到 82.2%</strong>，配对效应为 <strong>+8.14 pp</strong>（95% CI <strong>[+5.49, +10.98]</strong>）。AIME 2024 和 AIME 2025 的效应分别为 <strong>+8.33 pp</strong>（95% CI <strong>[+3.33, +14.17]</strong>）和 <strong>+15.83 pp</strong>（95% CI <strong>[+8.75, +23.75]</strong>）。但这些 GPQA/AIME 单元未通过 final validity 或截断率门禁，因此只作为严格准确率结果，不进入 token 效率推断。</p>
 
         <h2>到底是不是解析器的问题？</h2>
         <p>Qwen3.5 的 AIME 门禁失败最初可能被误判为解析器问题。产物审计表明，thinking/answer token 分区有效；主要失败发生在 reasoning-to-final 转换阶段：长推理耗尽预算后，模型未能输出终止性的最终答案。</p>
@@ -300,12 +356,12 @@
         <p>没有进入主结果不等于实验失败：它可能代表测量不合格、比较不可识别，或一个真实反例。</p>
 
         <h2>Takeaways：实验支持什么、不支持什么</h2>
-        <blockquote>在部分受控模型家族内，较大模型可以用更少的可见推理 token 达到相同或更高质量；GPT-OSS 证据较强，Qwen3.5 方向一致但范围更窄。</blockquote>
+        <blockquote>在部分受控模型家族内，较大模型可以用更少的可见推理 token 达到相同或更高质量。置信区间支持 GPT-OSS 在 MATH500、GPQA-Diamond 以及 Qwen3.5 在 MATH500 上的方向；Qwen3.5 可进入 token 效率推断的范围更窄。</blockquote>
         <ul>
-          <li><strong>这是有条件的家族内规律，不是参数规模定律。</strong>GPT-OSS 在 MATH500 上减少 50.6% 的可见推理，Qwen3.5 减少 18.7%，但这些结果不能外推为跨架构、跨训练配方的普适关系。</li>
+          <li><strong>这是有条件的家族内规律，不是参数规模定律。</strong>32K 下获得统计支持的准确率效应为：GPT-OSS MATH500 +1.35 pp、GPT-OSS GPQA +6.25 pp、Qwen3.5 MATH500 +4.68 pp，同时可见 thinking 也减少；这些结果不能外推为跨架构、跨训练配方的普适关系。</li>
           <li><strong>推理效率必须联合衡量质量、thinking tokens 与测量有效性。</strong>更短但没有完成 final 的响应不是高效；final validity、token partition 和截断率是指标的一部分，而不是事后清洗。</li>
           <li><strong>未进入主结果的家族分别揭示了测量失效、比较混杂和真实反例。</strong>“规模”只有在架构、后训练、MoE 激活规模和 tokenizer 足够可比时才是有意义的变量，不能通过筛掉反例制造整齐规律。</li>
-          <li><strong>可见 token 不等于总计算成本，当前前沿也只有有限分辨率。</strong>大模型可能生成更少 token，却仍有更高的单 token FLOPs、延迟或部署成本；现有实验只采样四档预算，部分 Qwen3.5 单元未被纳入 token 效率分析，GPT-OSS high-effort 仍是辅助不完整切片。</li>
+          <li><strong>小数据集尤其需要报告不确定性。</strong>AIME 只有 30 道独立题目；K=8 能稳定每道题的估计，却不会把它变成 240 个独立样本。因此 GPT-OSS AIME 2024 只能视为尚不确定的偏离，而不是已确立的反例。可见 token 也不等于总计算成本。</li>
         </ul>
 
         <h2>这次验证的投入规模</h2>
