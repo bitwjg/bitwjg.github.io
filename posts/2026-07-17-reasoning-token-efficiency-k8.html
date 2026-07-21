@@ -151,16 +151,13 @@
         <h3>GLM-4.5: a real counterexample plus inference-configuration sensitivity</h3>
         <p>At 32K on AIME, GLM-4.5-Air reaches <strong>64.4%</strong> <code>avg@8</code> versus <strong>55.0%</strong> for the full model; valid token partitions rule out a parser explanation. GPQA reverses direction and final validity is low, so the counterexample interacts strongly with output cap and exit-reasoning behavior. The report uses hybrid expert distillation and trains reasoning RL directly at <strong>64K</strong>; our 32K cap may amplify the issue, but a seed-0 64K diagnostic still did not restore larger-model dominance. The best classification is a genuine AIME counterexample plus configuration sensitivity, best followed up with targeted budget, template, stop-condition, and forced-finalization ablations.</p>
 
-        <h3>A diagnostic order for future community studies</h3>
+        <h3>Three recommendations for future community studies</h3>
         <ol>
-          <li><strong>Separate “the run completed” from “the measurement is eligible.”</strong> Complete coverage does not imply valid finals, valid token partitions, or acceptable truncation.</li>
-          <li><strong>Unit-test the parser on completed streams and control tasks.</strong> If completed streams parse but failed samples never contain a final answer, the root cause is usually finalization rather than extraction.</li>
-          <li><strong>Keep strict accuracy and censor token efficiency.</strong> A missing final is an error, but its short output must not be rewarded as efficient.</li>
-          <li><strong>Test budget interactions.</strong> Use multiple caps; a 32K-only result cannot separate capability from long-reasoning non-finalization.</li>
-          <li><strong>Do not use total MoE parameters as the only scale axis.</strong> Control or report active parameters, routing, and post-training differences.</li>
+          <li><strong>Verify measurement eligibility before interpreting coverage.</strong> Complete coverage does not imply valid finals, valid token partitions, or acceptable truncation. A missing final should count as an error, but its token length should not enter the efficiency comparison.</li>
+          <li><strong>Control comparability before attributing an effect to scale.</strong> Test multiple output caps and report active MoE parameters, routing, and post-training differences so configuration effects are not mistaken for scale effects.</li>
           <li><strong>Preserve genuine counterexamples.</strong> If the smaller model is better under valid measurement, it should constrain the conclusion rather than be relabeled as dirty data.</li>
         </ol>
-        <p>“Excluded from the main result” can therefore mean at least three scientifically different things: invalid measurement, a confounded causal comparison, or a genuinely better smaller model. Keeping them separate is the most reusable lesson beyond the headline result.</p>
+        <p>Exclusion from the main result does not mean experimental failure: it may indicate invalid measurement, an unidentifiable comparison, or a genuine counterexample.</p>
 
         <h2>Takeaways: what the experiment supports—and what it does not</h2>
         <blockquote>Within some controlled model families, a larger model can achieve equal or better quality with fewer visible reasoning tokens. The evidence is strong for GPT-OSS and directionally consistent but narrower for Qwen3.5.</blockquote>
@@ -293,16 +290,13 @@
         <h3>GLM-4.5：真实反例叠加推理配置敏感性</h3>
         <p>32K AIME 上，GLM-4.5-Air 的 <code>avg@8</code> 为 <strong>64.4%</strong>，高于完整模型的 <strong>55.0%</strong>；两者 token 分区有效，因此不能归咎于 parser。GPQA 的方向却相反，而且 final validity 偏低，说明这个反例与预算和退出推理行为存在强交互。技术报告采用 hybrid expert distillation，并直接在 <strong>64K</strong> 长度上做 reasoning RL；我们的 32K cap 可能放大问题，但 seed0 的 64K 诊断仍未恢复大模型优势。最稳妥的判断是“真实 AIME 反例 + 配置敏感性”，下一步应做预算、模板、终止条件和强制收尾的小规模消融。</p>
 
-        <h3>给后续社区实验的诊断顺序</h3>
+        <h3>给后续社区实验的三点建议</h3>
         <ol>
-          <li><strong>先分开“跑完了”和“能测量”。</strong>覆盖完整不代表 final validity、token partition 与截断率合格。</li>
-          <li><strong>用完整生成流和控制任务单测 parser。</strong>如果完整流能解析，而失败样本根本没有 final，根因通常在模型收尾而非抽取器。</li>
-          <li><strong>保留严格准确率，排除不合格的 token 指标。</strong>缺失 final 应计为错误，但不能用其短 token 长度证明高效。</li>
-          <li><strong>检查预算交互。</strong>至少比较多档 cap；只看 32K 无法区分能力差异与长推理未收尾。</li>
-          <li><strong>不要把 MoE 总参数当作唯一尺度轴。</strong>同时控制或报告激活参数、路由与后训练差异。</li>
-          <li><strong>保留真实反例。</strong>如果小模型在有效测量下确实更好，它应当限制结论，而不是被重新归类成“脏数据”。</li>
+          <li><strong>先确认结果“能测量”。</strong>覆盖完整不代表 final validity、token partition 和截断率合格；缺失 final 应计为错误，但其 token 长度不应进入效率比较。</li>
+          <li><strong>先控制可比性，再讨论规模效应。</strong>应比较多档输出预算，并报告 MoE 激活参数、路由和后训练差异，避免把配置差异误认为规模效应。</li>
+          <li><strong>保留真实反例。</strong>如果较小模型在有效测量下确实更好，这一结果应当限制结论，而不是被归类为“脏数据”。</li>
         </ol>
-        <p>因此，“没有进入主结果”至少可能表示三种不同的科学结果：测量不合格、因果比较存在混杂，或较小模型确实更好。把三者分开，是这轮实验除主结论之外最可复用的经验。</p>
+        <p>没有进入主结果不等于实验失败：它可能代表测量不合格、比较不可识别，或一个真实反例。</p>
 
         <h2>Takeaways：实验支持什么、不支持什么</h2>
         <blockquote>在部分受控模型家族内，较大模型可以用更少的可见推理 token 达到相同或更高质量；GPT-OSS 证据较强，Qwen3.5 方向一致但范围更窄。</blockquote>
