@@ -1,0 +1,447 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="A technical overview of loop Transformers as a third scaling axis between parameter scaling and explicit reasoning tokens." />
+  <link rel="canonical" href="https://bitwjg.github.io/posts/2026-07-22-loop-transformers-third-scaling-axis.html" />
+  <title>Loop Transformers: A Third Scaling Axis | Jingang Wang</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600&amp;family=IBM+Plex+Serif:wght@400;600&amp;display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/style.css?v=20260806" />
+</head>
+<body>
+  <nav class="masthead">
+    <div class="masthead__inner">
+      <a class="masthead__title masthead__home" href="../index.html" data-en="Jingang Wang" data-zh="王金刚">Jingang Wang</a>
+      <div class="masthead__nav">
+        <a href="../index.html#about" data-en="About Me" data-zh="关于我">About Me</a>
+        <a href="../index.html#publications" data-en="Publication List" data-zh="论文列表">Publication List</a>
+        <a href="../index.html#education-experience" data-en="Education / Experience" data-zh="教育 / 经历">Education / Experience</a>
+        <a href="../blog.html" data-en="Blog" data-zh="博客">Blog</a>
+      </div>
+    </div>
+  </nav>
+  <section class="banner">
+    <div class="banner__inner"><div class="banner__text">Wir müssen wissen, wir werden wissen</div></div>
+  </section>
+
+  <main class="single-page single-page--article">
+    <article class="section post research-post">
+      <a class="back-link" href="../blog.html" data-en="Back to Blog" data-zh="返回博客">Back to Blog</a>
+      <div class="section-heading post-heading">
+        <div>
+          <div class="post-kicker" data-en="Architecture and scaling overview" data-zh="架构与 Scaling 技术概览">Architecture and scaling overview</div>
+          <h1 class="post-title" data-en="Loop Transformers: A Third Scaling Axis" data-zh="Loop Transformer：模型的第三条 Scaling 轴">Loop Transformers: A Third Scaling Axis</h1>
+          <p class="post-subtitle"
+             data-en="Reframing reusable latent depth between parameter scaling and explicit reasoning tokens"
+             data-zh="在参数规模与显式推理 token 之间，重新理解可复用的潜在计算深度">
+            Reframing reusable latent depth between parameter scaling and explicit reasoning tokens
+          </p>
+        </div>
+        <button id="langToggle" class="lang-toggle" type="button" aria-label="Toggle language">
+          <span class="lang-label" data-en="中文" data-zh="EN">中文</span>
+        </button>
+      </div>
+      <div class="blog-meta" data-en="July 22, 2026 · Technical Overview" data-zh="2026年7月22日 · 技术概览">July 22, 2026 · Technical Overview</div>
+
+      <div class="post-language" data-lang-content="en">
+        <blockquote>This article synthesizes public papers and an author blog. Models, data, compute budgets, and evaluation protocols differ across studies, so the reported numbers illustrate within-paper findings rather than a unified leaderboard.</blockquote>
+        <p>The two most familiar ways to scale a language model are both expensive.</p>
+        <p>The first is to add parameters and data during training, storing more knowledge and capability in the weights. The second is to generate more reasoning tokens at inference time, explicitly unrolling a longer search process. The former raises training, storage, and deployment costs. The latter increases latency, KV-cache usage, and sequential decoding work.</p>
+        <p>Loop Transformers introduce a third control knob between them: <strong>reuse the same Transformer parameters to update hidden states repeatedly, trading additional latent depth for capability without storing a fresh set of weights at every effective layer.</strong></p>
+        <p>A standard Transformer applies</p>
+        <div class="method-note formula-note"><code>h<sub>l+1</sub> = F<sub>θ<sub>l</sub></sub>(h<sub>l</sub>)</code></div>
+        <p>whereas a looped model is closer to</p>
+        <div class="method-note formula-note"><code>h<sup>(r+1)</sup> = F<sub>θ</sub>(h<sup>(r)</sup>, x)</code></div>
+        <p>where the input <code>x</code> may be reinjected at every recurrence and <code>r</code> denotes the loop index. If a model stores <code>L</code> physical layers and executes each layer <code>R</code> times, it performs roughly <code>L × R</code> block executions while storing parameters for only about <code>L</code> layers.</p>
+        <p>The appealing claim is not that a small model becomes a large model for free. It is that three quantities can now be adjusted with greater independence:</p>
+        <ol>
+          <li><strong>How many distinct transformations are stored:</strong> parameter count.</li>
+          <li><strong>How many times hidden states are refined:</strong> latent recurrent depth.</li>
+          <li><strong>How many intermediate results are written into the context:</strong> reasoning tokens.</li>
+        </ol>
+        <p>My current view is that <strong>looping is a real scaling axis, but not free depth and not yet a universally validated replacement at frontier scale.</strong> Its value depends on three conditions holding at once: pretraining must teach a reusable iterative operator; recurrent dynamics must remain stable at useful depths; and the system must convert savings in parameter storage and communication into actual wall-clock gains.</p>
+        <h2>1. What exactly does the third axis scale?</h2>
+        <div class="table-wrap">
+          <table class="post-table">
+            <thead><tr><th>Scaling strategy</th><th>Primary resource added</th><th>Where intermediate state lives</th><th>Typical cost</th><th>Primary benefit</th></tr></thead>
+            <tbody>
+              <tr><td>Parameter scaling</td><td>Distinct parameters and layers</td><td>Weights and activations</td><td>Model memory, training FLOPs, deployment</td><td>Knowledge capacity and depth specialization</td></tr>
+              <tr><td>Explicit-token scaling</td><td>Generated sequence length</td><td>Context and KV cache</td><td>Decoding latency, KV memory, per-token compute</td><td>Readability, verification, tool use</td></tr>
+              <tr><td>Loop scaling</td><td>Executions of shared parameters</td><td>Hidden state</td><td>Activations, forward passes, latency, stability</td><td>Parameter reuse, continuous latent compute, adjustable depth</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>These approaches are not simple substitutes. Explicit chains of thought can be inspected, revised, and verified. Latent loops are compact but not inherently interpretable. Independent layers can specialize by depth; a shared layer must serve several stages of computation. Looping can reduce <strong>stored parameters</strong>, but it does not automatically reduce <strong>executed computation</strong>.</p>
+        <p>Any serious comparison should therefore report at least:</p>
+        <ul>
+          <li>stored parameters;</li>
+          <li>active parameters, especially for MoE models;</li>
+          <li>effective block executions, roughly physical depth times loop count;</li>
+          <li>training and inference FLOPs;</li>
+          <li>activation memory, KV cache, latency, and throughput;</li>
+          <li>optimizer-step time or tokens per second, not only a theoretical FLOPs proxy.</li>
+        </ul>
+        <p>A looped model may store fewer parameters while executing more block FLOPs. Conversely, it may have higher nominal FLOPs yet achieve better step time because it uses fewer pipeline stages, supports a larger microbatch, or reduces parameter communication.</p>
+        <h2>2. A long intellectual lineage</h2>
+        <p>Looping did not appear from nowhere.</p>
+        <p>The <strong>Universal Transformer</strong> already reused the same self-attention and transition modules across representation depth in 2018. With Adaptive Computation Time, different positions could consume different numbers of steps. It established the architectural viability of shared parameters and adaptive depth, along with a theoretical universality result under stated assumptions. It did not, however, answer the modern question: can a decoder-only LLM learn and exploit recurrent depth stably over hundreds of billions or trillions of pretraining tokens?</p>
+        <p><strong>ALBERT</strong> later showed that cross-layer sharing could deliver substantial parameter efficiency in large-scale pretraining. <strong>Deep Equilibrium Models</strong> reframed an infinitely deep weight-tied network as a fixed-point problem, trained through root finding and implicit differentiation. Both loosened the assumption that every extra layer requires a new parameter set, but their main goals—parameter reduction and equilibrium computation—differ from finite, explicitly controllable recurrent depth in decoder language models.</p>
+        <p>The ICLR 2024 paper <strong>Looped Transformers are Better at Learning Learning Algorithms</strong> moved the idea closer to reasoning. On synthetic in-context learning tasks, a one-layer looped GPT-2 could approach a 12-layer standard Transformer. The two models used about 0.79M and 9.48M parameters respectively, so the looped model had roughly one twelfth as many parameters. The method reinjected the original prompt at every recurrence and applied losses over several of the final loop steps rather than supervising only the last one.</p>
+        <p>The important lesson was not that one layer had categorically beaten twelve. It was that weight sharing may be a more natural inductive bias when a task calls for repeated applications of a similar update rule. The model behaves more like an iterative algorithm. The same work also found boundaries: an error floor remained, excessive recurrence slowed or destabilized training, and the learned procedure did not generalize as a fully distribution-independent algorithm.</p>
+        <p>In 2025, <strong>Huginn</strong> and <strong>Ouro</strong> brought recurrent depth into the main path of language-model pretraining. In 2026, <strong>Fully Looped Transformer, STARS, The Readout Blind Spot,</strong> and <strong>Loopie</strong> added important pieces on stability, failure mechanisms, and system efficiency.</p>
+        <h2>3. Two main architectures: model-loop and layer-loop</h2>
+        <p>Suppose a physical model stores three layers and executes each one twice:</p>
+        <pre><code>model-loop: L1 → L2 → L3 → L1 → L2 → L3
+layer-loop: L1 → L1 → L2 → L2 → L3 → L3</code></pre>
+        <p>In a <strong>model-loop</strong>, the entire physical stack acts as a recurrent core. The output of one full pass returns to the first layer. Huginn's prelude–core–coda design and Ouro both belong broadly to this family. The loop boundary is explicit, making it convenient to control total recurrence, learn exit gates, or reinject the input at each pass.</p>
+        <p>In a <strong>layer-loop</strong>, each physical layer runs multiple times before execution moves to the next layer. Loopie adopts this pattern and offers two reasons to take it seriously.</p>
+        <p>The first is systems locality. A model-loop sends computation from the last pipeline stage back to the first, creating cyclic dependencies and pipeline bubbles. Layer-loop repetition remains within the current stage and fits existing parallel-training stacks more naturally.</p>
+        <p>The second is a more local parameter-sharing pattern. In a 48-layer model with two full-stack loops, the third physical layer is used at effective depths 3 and 51. Those invocations receive states that have undergone very different amounts of preceding computation, potentially asking one shared transform to serve both early- and late-depth roles. A layer-loop reuses a layer at adjacent effective depths, where its role may be more coherent.</p>
+        <p>This argument needs calibration. Prior work shows that lower, middle, and final Transformer layers do not represent information uniformly, making heterogeneous demands across distant effective depths plausible. <strong>It does not directly prove gradient conflict.</strong> “Natural parameter sharing” is best treated as an empirically motivated design hypothesis, not a settled mechanism.</p>
+        <p>Loopie's long training curves add supporting evidence: layer-loop starts slightly behind model-loop and overtakes after roughly 1.2T tokens. But this result still depends on architecture, optimization, and system conditions. One curve does not establish universal layer-loop superiority.</p>
+        <h2>4. Four stages that should not be conflated</h2>
+        <p>Pretraining, post-training, test-time compute, and test-time training are often mixed together in loop discussions. They are four different experiments.</p>
+        <div class="table-wrap">
+          <table class="post-table">
+            <thead><tr><th>Stage</th><th>Are weights updated?</th><th>Does loop count vary?</th><th>Main objective</th><th>Examples</th></tr></thead>
+            <tbody>
+              <tr><td>Loop-aware pretraining</td><td>Yes</td><td>Fixed or sampled during training</td><td>Learn a stable reusable recurrent operator</td><td>Huginn, Ouro, Loopie</td></tr>
+              <tr><td>Post-training (SFT/RL)</td><td>Yes</td><td>Usually keeps the pretrained structure</td><td>Shape reasoning, instruction following, and behavior</td><td>Ouro Thinking, Loopie SPT/RL</td></tr>
+              <tr><td>Frozen-weight depth scaling</td><td>No</td><td>Yes</td><td>Trade more forward recurrences for capability</td><td>Huginn, FLT, STARS</td></tr>
+              <tr><td>TTT / test-time adaptation</td><td>Temporarily, then reset</td><td>May be fixed or changed</td><td>Adapt a small parameter subset to the current prompt or task</td><td>Loop-TTT blog experiment</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>The first stage is foundational. If a model never learned recurrent dynamics during pretraining, mechanically rerunning an ordinary checkpoint's layers at inference will not usually produce stable gains. Huginn samples recurrence counts during training. Ouro trains predictions at multiple steps and learns adaptive exits. Loopie is pretrained from scratch with two layer-local executions. None is a training-free retrofit of a standard checkpoint.</p>
+        <p>The second stage shapes behavior after the base model is trained. Loopie calls its large target-only supervised stage <strong>Supervised Pre-Training (SPT)</strong>, but in lifecycle terms it occurs after base pretraining, followed by math and code RL. The final Thinking model's competition results combine looped pretraining, SPT, RL, and generate–verify–refine. They cannot all be attributed to layer-looping.</p>
+        <p>The third stage freezes the weights and changes only inference depth. Some papers loosely call this test-time adaptation, which can be misleading. The relevant Fully Looped Transformer experiments vary loop depth with frozen weights; no gradient-based adaptation occurs on the test sample.</p>
+        <p>The fourth stage is test-time training in the strict sense: compute a loss from the current input, perform one or a few gradient updates, and reset afterward. It incurs backward-pass and optimizer costs and should not be compared with extra forward loops under an unmatched latency budget.</p>
+        <h2>5. Huginn: learning recurrent depth during pretraining</h2>
+        <p>Huginn is a useful starting point for modern looped LLMs. It divides the network into a prelude, a recurrent core, and a coda. The prelude introduces token representations into the loop, the core updates latent state repeatedly, and the coda produces logits. The reported 3.5B model uses a 2–4–2 physical-layer layout. Repeating the four-layer core an average of 32 times yields an effective depth of about <code>2 + 4 × 32 + 2 = 132</code> block executions.</p>
+        <p>The core contribution is not copying four layers 32 times. Training samples the recurrence count from a distribution and backpropagates through only the final subset of iterations. The model therefore cannot rely entirely on one absolute value of <code>r</code>; it must learn an update process that continues to function across a range of depths.</p>
+        <p>Huginn also shows how much more fragile recurrence becomes at scale. Early runs experienced representation or recurrence collapse. Sandwich RMSNorm, repeated input injection, and initialization choices became essential. The final model trained on about 800B tokens. Around the trained depth range, additional recurrence improved several tasks, and the paper explored per-token adaptive compute based on state convergence, KV-cache sharing, continuous-CoT warm starts, and self-speculative decoding.</p>
+        <p>These results support two claims. First, latent recurrence can be learned in realistic language-model pretraining, not only in synthetic regression. Second, hidden trajectories display convergence, orbit-like motion, and gradual state changes. But calling those trajectories an “invisible chain of thought” remains an interpretation, not an identified causal mechanism. We can verify repeated state transformation and task gains; we cannot read a human-level reasoning step out of every recurrence.</p>
+        <h2>6. Ouro: parameter efficiency is real, but shared depth is not independent depth</h2>
+        <p>Ouro develops model-looping into a more complete training pipeline. The same physical stack is applied repeatedly, with an exit gate at each recurrence. The objective includes entropy regularization to prevent the gate from collapsing to the deepest step. A later phase freezes the language model and sharpens depth allocation based on marginal loss improvement.</p>
+        <p>Ouro provides a strong signal for the approach. Its 1.4B and 2.6B models approach larger models on some benchmarks, summarized by the paper as roughly 2–3× parameter efficiency. Controlled synthetic-knowledge experiments separate storing facts from manipulating them: extra loops do not create additional factual storage, but they improve multi-hop composition and knowledge manipulation. That is consistent with the third-axis view—recurrence adds operations over existing representations rather than new storage slots.</p>
+        <p>One appendix result is more important than the headline: <strong>when model size, training tokens, and recurrent executions are controlled, a standard Transformer with independent layer parameters still outperforms the LoopLM.</strong> The gap initially grows with deeper recurrence and narrows somewhat at larger model scale.</p>
+        <p>This reframes the real question. Looping does not claim that shared depth is intrinsically more expressive than untied depth. It asks:</p>
+        <blockquote>Under constraints on parameter storage, communication, deployment, or system efficiency, can shared depth offer a better overall exchange rate?</blockquote>
+        <p>Independent layers are free to specialize by depth and are naturally more expressive. Looping must earn its advantage through parameter reuse, increased training scale, adaptive depth, or better systems behavior—not by assuming that sharing has no cost.</p>
+        <h2>7. Why deeper loops fail: a dynamical-systems problem</h2>
+        <p>Writing the recurrent core as</p>
+        <div class="method-note formula-note"><code>h<sub>t+1</sub> = Φ<sub>θ</sub>(h<sub>t</sub>; x)</code></div>
+        <p>makes the issue explicit. Every additional loop applies the same nonlinear dynamical system again. The trained depth range covers only a segment of its trajectory. Beyond that segment, the state may converge, oscillate, drift, explode, or fall into an undesirable attractor.</p>
+        <h3>7.1 Residual explosion and oscillating gradients</h3>
+        <p>Fully Looped Transformer identifies two characteristic failure modes: early gradient oscillation and residual explosion as loop count rises. Its original looped baselines collapse at 9 or 12 loops in some small-model settings.</p>
+        <p>The paper proposes two parameter-free changes. Fully Looped Architecture exposes the previous loop's output to every physical layer rather than injecting it only at the loop boundary. Attention Injection uses the previous loop state as the query and the current layer state as key/value while reusing existing projections. In 127M/318M experiments, these changes remain stable through 12 loops. In one reported average, the original looped model falls from 40.52 at three loops to 36.56 at six, while the Fully Looped model rises from 39.90 at three loops to 41.72 at nine.</p>
+        <p>The paper's 13.2% figure is a relative improvement over its original looped baseline in a particular six-loop setting, not a universal 13.2-point gain. The models are only hundreds of millions of parameters. The work is valuable as a diagnosis and architectural remedy, not as a completed frontier-scale extrapolation.</p>
+        <h3>7.2 Bounded state is not necessarily useful state</h3>
+        <p>STARS frames local stability through the Jacobian spectral radius. Near a state, if <code>ρ(J) &lt; 1</code> for <code>J = ∂Φ/∂h</code>, perturbations contract locally; sustained values above one can amplify errors through recurrence.</p>
+        <p>The method estimates the spectral radius with one power iteration and combines Jacobian Spectral Radius Regularization with random loop sampling. On Ouro-1.4B fine-tuned on 400K NuminaMath examples, the base model's average drops from 67.41 at <code>r=4</code> to 55.09 at <code>r=8</code>; ordinary SFT falls from 70.46 to 52.97; STARS falls more gently from 74.18 to 65.55. It substantially reduces deep-loop degradation, but it does not make accuracy monotonic in depth.</p>
+        <p>The lesson is that <strong>stability is necessary but not sufficient</strong>. A dynamical system can converge reliably to an unhelpful fixed point, or remain bounded while collapsing distinct inputs into poorly separated attractors.</p>
+        <h3>7.3 The readout blind spot in dense supervision</h3>
+        <p>A subtler failure comes from normalization. Many models attach a cross-entropy loss to every loop, which appears to provide dense supervision. But with RMSNorm or LayerNorm before the logits, the readout is approximately invariant to the hidden state's overall scale. Scaling <code>h</code> changes little after normalization, so the immediate CE loss supplies almost no radial gradient.</p>
+        <p>The pre-norm recurrent path still receives the unnormalized state in the next loop. Scale can therefore accumulate while every per-loop readout remains blind to it. <strong>The Readout Blind Spot</strong> reports final hidden norms of 39,207 and 56,051 in 44M/129M models using per-loop CE with normalized readouts. Raw, scale-visible readouts or explicit norm penalties keep norms in the tens and recover perplexity improvements as loop count increases.</p>
+        <p>This explains why “loss at every loop” may still fail to train a useful recurrent process. It also reveals an evaluation trap: if an exit gate always halts early, the model may have learned efficient adaptive compute—or later loops may simply have no value. Ouro's inter-loop RMSNorm mitigates this specific problem, but the main causal evidence remains small-scale; its 1.4B experiment is closer to a sanity check.</p>
+        <h2>8. Loopie: layer-looping as model–system co-design</h2>
+        <p>Loopie is one of the clearest cases for asking whether recurrence can produce real training gains. It does not merely run every layer of a 48-layer model twice. It roughly halves stored depth, restores effective execution depth with <code>R=2</code> layer-loops, and reinvests memory savings into width, depth, and batch organization.</p>
+        <p>The paper's Qwen3-like reference is approximately 30B-A3B with 48 layers and hidden size 2048. The selected Loopie is about 20B-A2B with 27 layers and hidden size 2304, each layer executed twice. A block-compute proxy places Loopie at about 1.42× the reference's nominal compute, while an activation proxy at the reference microbatch is about 0.63×. Fewer physical layers allow the microbatch to double and gradient-accumulation steps to halve, bringing measured optimizer-step time close to the baseline.</p>
+        <p>“Compute matched” therefore means matched hardware, tokens, updates, and approximately step time—not identical theoretical FLOPs. That is an important engineering result and a reminder that neither parameter count nor FLOPs alone captures efficiency.</p>
+        <p>In pretraining, Loopie overtakes the vanilla baseline after roughly 600B tokens. The model-loop/layer-loop comparison reverses in favor of layer-loop after about 1.2T tokens. The paper also builds a scaling ladder from 0.15B to 1B active parameters with approximately wall-clock-matched pairs and observes a Loopie advantage at every rung. A controlled 6B-A0.6B ablation becomes worse when the layer-loop schedule is removed, supporting the view that the result is not merely hidden extra compute.</p>
+        <p>Three limits remain. First, the public ladder's largest baseline has only about 1B active parameters, still far from frontier scale. Second, the final 20B-A2B Thinking model adds roughly 2T supervised tokens, math/code RL, and generate–verify–refine at competition time. Third, <code>R=2</code> is selected because marginal recurrence returns decline under a fixed pretraining budget; it is not a universal optimum.</p>
+        <p>Loopie's strongest conclusion is therefore not that looped models now beat large models everywhere. It is that <strong>layer-looping can turn parameter sharing into activation, pipeline, and batch efficiency, then use model–system co-design to move the wall-clock frontier.</strong></p>
+        <h2>9. Evaluate with a scaling ladder, not one large run</h2>
+        <p>Loop Transformers particularly need scaling ladders. Gains from recurrence at small scale may change with width, data, training duration, and hardware parallelism. A single large run cannot cleanly separate architectural gains from extra FLOPs or a stronger training recipe.</p>
+        <p>An informative ladder should:</p>
+        <ol>
+          <li>keep data distribution, tokenizer, optimizer, training stages, and evaluation consistent across several scale rungs;</li>
+          <li>state whether it matches theoretical FLOPs, tokens, step time, total wall-clock, or hardware budget;</li>
+          <li>report stored and active parameters, physical layers, loop count, and effective block executions separately;</li>
+          <li>include a non-looped control and ablations for “extra compute only” and alternative sharing patterns;</li>
+          <li>estimate trends at smaller scales, then calibrate extrapolation with a limited number of larger checkpoints.</li>
+        </ol>
+        <p>TPP usually means <strong>tokens per parameter</strong>, <code>D/N</code>. For dense models, <code>N</code> is relatively unambiguous. For MoE, a paper must state whether the denominator is total or active parameters. Loopie's ladder uses roughly 1,000 active-parameter tokens per active parameter, except for a token cap at the largest rung. Fixed TPP keeps models at roughly comparable data-to-parameter training stages, but it is not fixed total FLOPs and does not imply fixed wall-clock.</p>
+        <p>If a team uses a composite CE (compute-efficiency) score, it should publish the formula, baseline, denominator, and aggregation. CE is not a cross-paper standard unit. The most robust public presentation remains a performance–compute frontier under an explicit resource constraint.</p>
+        <p>For looped models, I would report three frontiers:</p>
+        <ul>
+          <li>quality versus stored parameters, for parameter efficiency;</li>
+          <li>quality versus training wall-clock or FLOPs, for training efficiency;</li>
+          <li>quality versus inference latency or executed FLOPs, for inference efficiency.</li>
+        </ul>
+        <p>Improving only the first may amount to trading compute for memory. Improving all three would be much closer to an architectural breakthrough.</p>
+        <h2>10. Increasing loops at inference: depth is not unlimited</h2>
+        <p>The most attractive story is to train once and allocate more loops to harder problems at inference. Public evidence supports adjustment within or near the trained range; it does not support arbitrary extrapolation.</p>
+        <p>Huginn samples recurrence depths during training. Ouro learns exit gates. Fully Looped Transformer and STARS extend the stable range through architecture and regularization. Yet several experiments show the same pattern: adding loops helps up to around the trained depth, then performance fluctuates, degrades, or collapses.</p>
+        <p>This differs from explicit chain-of-thought scaling. Every generated token writes a new state into the context and receives direct next-token supervision. A latent loop repeatedly transforms the same state through a shared dynamical system. One more recurrence is not a free extra thought; it moves the state farther from the trajectory covered during training.</p>
+        <p>A more rigorous deployment policy would:</p>
+        <ul>
+          <li>treat loop count as a training condition, not merely an inference hyperparameter;</li>
+          <li>calibrate depth–quality–latency curves by task;</li>
+          <li>base exit decisions on verifiable marginal value, not only apparent state convergence;</li>
+          <li>label depths beyond the trained maximum as extrapolation;</li>
+          <li>compare loops with explicit reasoning tokens, verifiers, and self-consistency under matched latency.</li>
+        </ul>
+        <h2>11. TTT is a separate path: update parameters instead of only adding depth</h2>
+        <p>Alvin Zhou's Loop-TTT blog offers an illuminating, easily misread experiment. Using the Ouro-1.4B base model at its trained depth <code>r=4</code>, the author performs one prompt-entropy gradient update on 97 RMSNorm scale vectors—198,656 scalars, about 0.014% of the model—and resets after each batch.</p>
+        <p>On 500 GSM8K four-shot examples, accuracy rises from 0.766 to 0.848, an 8.2-point gain. Simply increasing the loop count from <code>r=4</code> to <code>r=8</code> yields only 0.694. A MATH-500 subset gains about three points, while an MMLU subset is nearly flat. The result suggests that a tiny temporary calibration of a shared recurrent operator may be more effective than blindly executing that operator more times.</p>
+        <p>The most informative result is the author's own counter-analysis. Almost all of the gain comes from the four demonstrations shared across questions rather than question-specific information. Updating on exemplars alone recovers about +7.0 of the full gain; a fixed cached update vector recovers most of it; update directions across batches have cosine similarity 0.99. The more accurate description is therefore <strong>cacheable prompt or task calibration</strong>, not per-question online learning.</p>
+        <p>The study is exploratory. Hyperparameters were tuned while observing GSM8K test accuracy; there is no comparison with a stronger post-trained Ouro; TTT requires forward, backward, and optimizer work without a strict latency match; and the same update is nearly neutral on Qwen2.5-3B. It is a promising side branch, not evidence that loop pretraining is already mature.</p>
+        <h2>12. What the evidence supports today</h2>
+        <div class="table-wrap">
+          <table class="post-table">
+            <thead><tr><th>Claim</th><th>Current evidence</th><th>What remains missing</th></tr></thead>
+            <tbody>
+              <tr><td>Shared parameters can learn iterative update rules</td><td>Synthetic ICL, Huginn/Ouro pretraining</td><td>Mechanistic validation across broader tasks and larger scales</td></tr>
+              <tr><td>Loops can improve parameter efficiency</td><td>Ouro and parts of Loopie's comparisons</td><td>Frontier-scale replication with matched data and recipe</td></tr>
+              <tr><td>Shared depth can replace independent depth</td><td>Only partially; Ouro's controlled standard model remains stronger</td><td>Where the exchange rate becomes favorable</td></tr>
+              <tr><td>More test-time loops can improve quality</td><td>Positive results within trained depth ranges</td><td>Reliable extrapolation and per-sample routing</td></tr>
+              <tr><td>Stability failures can be mitigated</td><td>FLT, STARS, readout fixes</td><td>Large-scale, long-run, cross-domain validation</td></tr>
+              <tr><td>Layer-loop is generally better than model-loop</td><td>Loopie systems analysis and long training curves</td><td>Better-controlled replication and direct gradient evidence</td></tr>
+              <tr><td>Looping reduces real training cost</td><td>Loopie model–system co-design</td><td>Portability across clusters, parallel strategies, and scales</td></tr>
+              <tr><td>TTT is a general inference enhancement</td><td>Signal in one exploratory case</td><td>Preregistered, cost-matched, cross-model evaluation without shared demos</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>Three findings appear most robust.</p>
+        <p><strong>First, parameter sharing is not computation sharing.</strong> Looping reduces the number of distinct weights, not the operations executed per token. Its earliest gains are often in parameter memory, communication, and activation organization. Whether total time falls depends on the system.</p>
+        <p><strong>Second, recurrent depth must be modeled during training.</strong> Random depth, input injection, per-loop supervision, state normalization, exit gating, and dynamics regularization are not decorative details. They determine whether the model learns an operator that can keep running.</p>
+        <p><strong>Third, a shared operator creates functional-conflict and dynamical risks.</strong> Distant effective depths may demand different transforms; normalized readouts may ignore state scale; and extra loops outside the trained range may overthink. These are central architectural problems, not incidental tuning noise.</p>
+        <h2>13. My view: conditional optimism</h2>
+        <p>The most promising Loop Transformer is unlikely to compress a 100-layer model into one layer repeated 100 times. A more practical design will <strong>retain enough untied structure while selectively sharing the computations that can form a stable iterative process</strong>. Prelude/coda layers, grouped recurrence, layer-loops, partially untied layers, recurrent MoE, and hybrids of explicit-token reasoning with latent loops may all be more viable than indiscriminate full-model recurrence.</p>
+        <p>The next research questions are concrete:</p>
+        <ol>
+          <li><strong>What should be shared?</strong> Which layers support local reuse, and which require depth specialization? Can natural sharing be tested directly with representation similarity, gradient angles, or functional probes?</li>
+          <li><strong>How long should the model loop?</strong> Can marginal value of compute be calibrated rather than delegated to an exit gate that may learn shortcuts?</li>
+          <li><strong>How do we preserve useful dynamics?</strong> Which measurements of spectral radius, state scale, direction, and attractor structure predict generation quality?</li>
+          <li><strong>How should recurrence interact with MoE?</strong> Should loops share experts, route to different experts, or allow routing itself to evolve across recurrence?</li>
+          <li><strong>How should systems gains be accounted for?</strong> Training and inference results should include step time, throughput, activation, KV, communication, and energy—not only stored parameters.</li>
+          <li><strong>How should latent and explicit reasoning cooperate?</strong> Which computation belongs in compact continuous state, and which steps should be written as tokens for verifiers, tools, or users?</li>
+        </ol>
+        <p>If these questions are answered on reliable scaling ladders, model scaling will move beyond a one-dimensional discussion of parameter count. We will instead reason over a resource surface: how many weights to store, how many latent updates to execute, and how much explicit reasoning to generate.</p>
+        <p>That may be the real significance of Loop Transformers. They do not end scaling; they turn it from a line into a design space with at least three dimensions.</p>
+        <hr>
+        <h2>References</h2>
+        <ol class="source-list">
+          <li>Dehghani et al., <a href="https://arxiv.org/abs/1807.03819" target="_blank" rel="noreferrer">Universal Transformers</a>, 2018 / ICLR 2019.</li>
+          <li>Lan et al., <a href="https://arxiv.org/abs/1909.11942" target="_blank" rel="noreferrer">ALBERT: A Lite BERT for Self-supervised Learning of Language Representations</a>, 2019 / ICLR 2020.</li>
+          <li>Bai et al., <a href="https://arxiv.org/abs/1909.01377" target="_blank" rel="noreferrer">Deep Equilibrium Models</a>, 2019 / NeurIPS 2019.</li>
+          <li>Yang et al., <a href="https://arxiv.org/abs/2311.12424" target="_blank" rel="noreferrer">Looped Transformers are Better at Learning Learning Algorithms</a>, ICLR 2024.</li>
+          <li>Geiping et al., <a href="https://arxiv.org/abs/2502.05171" target="_blank" rel="noreferrer">Scaling up Test-Time Compute with Latent Reasoning: A Recurrent Depth Approach</a>, 2025.</li>
+          <li>Zhu et al., <a href="https://arxiv.org/abs/2510.25741" target="_blank" rel="noreferrer">Scaling Latent Reasoning via Looped Language Models</a> (Ouro), 2025.</li>
+          <li>Fu et al., <a href="https://arxiv.org/abs/2605.18797" target="_blank" rel="noreferrer">Simply Stabilizing the Loop via Fully Looped Transformer</a>, 2026.</li>
+          <li>Yang et al., <a href="https://arxiv.org/abs/2605.26733" target="_blank" rel="noreferrer">Stabilizing Recurrent Dynamics for Test-Time Scalable Latent Reasoning in Looped Language Models</a> (STARS), 2026.</li>
+          <li>Sharma and Vu, <a href="https://arxiv.org/abs/2606.24898" target="_blank" rel="noreferrer">Dense Supervision Is Not Enough: The Readout Blind Spot in Looped Language Models</a>, 2026.</li>
+          <li>Gao et al., <a href="https://arxiv.org/abs/2607.16051" target="_blank" rel="noreferrer">Loop the Loopies!</a> (Loopie), 2026.</li>
+          <li>Alvin Zhou, <a href="https://alvinzh04.github.io/blog/looped-ttt.html" target="_blank" rel="noreferrer">Loop deeper, or adapt? Test-time training in looped transformers</a>, 2026.</li>
+        </ol>
+      </div>
+
+      <div class="post-language" data-lang-content="zh" lang="zh-CN" hidden>
+        <blockquote>这是一版研究初稿。文中的公开结果来自论文或作者博客；不同工作的模型、数据、算力与评测协议并不一致，因此数字只用于说明各自论文中的现象，不构成统一排行榜。</blockquote>
+        <p>过去几年，大模型最熟悉的两种扩展方式都很昂贵。</p>
+        <p>第一种是在训练阶段增加参数和数据，把更多知识与能力压进权重。第二种是在推理阶段生成更多 reasoning tokens，让模型把搜索过程显式展开。前者增加模型存储、训练和部署成本，后者增加延迟、KV cache 与序列计算成本。</p>
+        <p>Loop Transformer 提出了介于两者之间的第三个旋钮：<strong>不为每一层都存一套新参数，而是让同一组 Transformer 参数反复作用于隐藏状态，用更多潜在计算深度换取能力。</strong></p>
+        <p>如果标准 Transformer 是</p>
+        <div class="method-note formula-note"><code>h<sub>l+1</sub> = F<sub>θ<sub>l</sub></sub>(h<sub>l</sub>)</code></div>
+        <p>那么 looped model 更接近</p>
+        <div class="method-note formula-note"><code>h<sup>(r+1)</sup> = F<sub>θ</sub>(h<sup>(r)</sup>, x)</code></div>
+        <p>其中 <code>x</code> 可以在每轮重新注入，<code>r</code> 是循环次数。假设模型保存 <code>L</code> 个物理层，每层循环 <code>R</code> 次，它执行了约 <code>L × R</code> 次 block 计算，却只需要保存约 <code>L</code> 层参数。</p>
+        <p>这件事最吸引人的地方，不是“用小模型免费得到大模型”，而是让我们第一次可以相对独立地调节三个量：</p>
+        <ol>
+          <li><strong>存储多少不同的变换</strong>：参数规模；</li>
+          <li><strong>在隐藏空间里反复更新多少次</strong>：潜在循环深度；</li>
+          <li><strong>向上下文中显式写出多少中间结果</strong>：reasoning tokens。</li>
+        </ol>
+        <p>我目前的判断是：<strong>Loop Transformer 确实构成了一条值得认真对待的 scaling 轴，但它不是免费的深度，也还不是已经被 frontier 规模验证的通用替代方案。</strong>它的价值取决于三件事是否同时成立：循环算子在预训练中学到了可迭代的更新规则；循环动力学在更深处仍然稳定；系统能把参数共享省下的内存与通信真正转换成更好的 wall-clock 效率。</p>
+        <h2>1. 第三条轴，究竟在扩展什么</h2>
+        <p>把“模型更大”“想得更久”和“循环更深”放在一起看，会更容易理解 loop 的位置。</p>
+        <div class="table-wrap">
+          <table class="post-table">
+            <thead><tr><th>Scaling 方式</th><th>增加的主要资源</th><th>中间状态在哪里</th><th>典型代价</th><th>主要优势</th></tr></thead>
+            <tbody>
+              <tr><td>参数 scaling</td><td>不同参数与层</td><td>权重和激活</td><td>模型内存、训练 FLOPs、部署成本</td><td>知识容量与不同深度的专门化</td></tr>
+              <tr><td>显式 token scaling</td><td>生成序列长度</td><td>上下文与 KV cache</td><td>解码延迟、KV、逐 token 计算</td><td>可读、可验证、可调用工具</td></tr>
+              <tr><td>loop scaling</td><td>共享参数的执行次数</td><td>隐藏状态</td><td>激活、前向次数、延迟、稳定性</td><td>参数复用、连续潜在计算、可调深度</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>三者不是简单替代关系。显式 CoT 能外化、回看和验证中间步骤；latent loop 的状态更紧凑，却不天然可解释。增加独立层允许不同深度形成不同功能；共享层要求一个算子承担多轮更新。Loop 能减少<strong>存储参数</strong>，却不会自动减少<strong>执行计算</strong>。</p>
+        <p>因此讨论 loop 时，至少要同时报告下面几个量：</p>
+        <ul>
+          <li>stored parameters：真正需要保存和通信的参数；</li>
+          <li>active parameters：一次 token 前向实际激活的参数，MoE 尤其需要单列；</li>
+          <li>effective block executions：物理层数乘以循环次数；</li>
+          <li>training FLOPs 与 inference FLOPs；</li>
+          <li>activation memory、KV cache、延迟和吞吐；</li>
+          <li>optimizer-step time 或 tokens/second，而不只是一条理论 FLOPs 公式。</li>
+        </ul>
+        <p>这组区分很重要。一个模型完全可能只有较少的 stored parameters，却执行更多 block FLOPs；也可能名义 FLOPs 更高，但因为减少流水线 stage、提升 microbatch 或降低参数通信，实际 step time 反而更好。</p>
+        <h2>2. 这不是突然出现的新想法</h2>
+        <p>Loop Transformer 有一条很长的思想谱系。</p>
+        <p>2018 年的 <strong>Universal Transformer</strong> 已经把相同的 self-attention 和 transition 模块沿“表示深度”重复应用，并引入 Adaptive Computation Time，让不同位置可以使用不同计算步数。它证明了共享参数、按需增加深度在架构上是成立的，也给出了计算通用性的理论讨论。但那项工作并没有回答今天最关键的问题：decoder-only LLM 在数千亿乃至数万亿 token 的训练中，能否稳定地学会并利用这种循环。</p>
+        <p>随后，<strong>ALBERT</strong> 展示了跨层参数共享在大规模预训练中的参数效率；<strong>Deep Equilibrium Models</strong> 则把无限深权重共享网络写成固定点求解问题，通过隐式微分训练。这些工作都在减少“每加一层就必须增加一套参数”的绑定，但它们分别更关注参数压缩和收敛到平衡态，并不等同于今天这种可显式控制循环次数、用有限递归深度扩展语言模型计算的路线。</p>
+        <p>2024 年 ICLR 的 <strong>Looped Transformers are Better at Learning Learning Algorithms</strong> 把问题推进了一步：一个只有单层、反复循环的 GPT-2，在若干 synthetic in-context learning 任务上，可以接近 12 层标准 Transformer。实验模型约 0.79M 参数，对照约 9.48M，不到十分之一。它还使用 input injection——每轮把原始输入重新加回状态——以及对最后若干循环共同施加 loss，避免只监督最终一步。</p>
+        <p>这项工作的真正意义不是“单层已经击败 12 层”，而是提示了一个更强的归纳偏置：当任务本身需要反复执行近似相同的更新规则时，权重共享可能比堆叠大量独立变换更自然。它学习的更像一个迭代算法。但它也暴露了边界：误差会出现 floor，增加循环过多会拖慢或扰乱训练，而且在更广的分布上并没有学到完全通用的算法。</p>
+        <p>到了 2025 年，<strong>Huginn</strong> 和 <strong>Ouro</strong> 才真正把 recurrent depth 推向语言模型预训练主线。2026 年的 <strong>Fully Looped Transformer、STARS、The Readout Blind Spot</strong> 与 <strong>Loopie</strong>，则分别补上了稳定性机制、失效解释和系统效率上的关键拼图。</p>
+        <h2>3. 两种主架构：model-loop 与 layer-loop</h2>
+        <p>今天最常见的 loop 方式可以粗分为两类。</p>
+        <p>假设物理模型有三层 <code>L_1,L_2,L_3</code>，每层使用两次：</p>
+        <pre><code>model-loop: L1 → L2 → L3 → L1 → L2 → L3
+layer-loop: L1 → L1 → L2 → L2 → L3 → L3</code></pre>
+        <p><strong>Model-loop</strong> 把整个物理模型当成 recurrent core。一轮走完整个 stack，再把输出送回第一层。Huginn 的 prelude–recurrent core–coda 设计与 Ouro 都属于这一大类。它的优点是“每轮”边界清晰，便于控制总递归深度、设计 exit gate，或者在每轮重新注入输入。</p>
+        <p><strong>Layer-loop</strong> 则让每个物理层连续执行多次，再进入下一层。Loopie 采用的就是这种方式。它给出了两个值得重视的理由。</p>
+        <p>第一是系统局部性。model-loop 会让计算从最后一个 pipeline stage 返回第一个 stage，形成周期依赖和 pipeline bubble；layer-loop 的重复计算停留在当前 stage，更容易与现有并行训练栈结合。</p>
+        <p>第二是更“自然”的参数共享位置。以一个 48 层、循环两轮的 model-loop 为例，第三个物理层会在有效深度 3 和 51 被调用。两次接收到的表示，已经经历了非常不同数量的前序计算；一个共享变换可能被要求同时承担早期层和后期层的不同功能。layer-loop 中，同一层通常作用于相邻有效深度，角色可能更一致。</p>
+        <p>这里需要克制一点：已有研究说明 Transformer 的底层、中层和末层表示并不均匀，不同语言抽象也会在不同深度变得可读；这让“相隔很远的有效深度可能提出异质要求”听起来合理。<strong>但它还不是梯度冲突的直接证明。</strong>目前更准确的说法是：natural parameter-sharing pattern 是一个有实验支持的设计假设，而不是已经被机制实验完全确认的定律。</p>
+        <p>Loopie 的训练曲线为这个假设补了一点经验依据：layer-loop 早期略落后于 model-loop，但训练约 1.2T tokens 后反超。不过，这一结果仍然同时包含架构、优化与系统条件，不能仅凭一条曲线宣布 layer-loop 普遍优于 model-loop。</p>
+        <h2>4. 最容易混淆的四个阶段</h2>
+        <p>Loop 相关讨论经常把 pretraining、post-training、test-time compute 和 test-time training 混在一起。它们其实是四种不同实验。</p>
+        <div class="table-wrap">
+          <table class="post-table">
+            <thead><tr><th>阶段</th><th>权重是否更新</th><th>循环次数是否变化</th><th>主要目标</th><th>代表工作</th></tr></thead>
+            <tbody>
+              <tr><td>Loop-aware pretraining</td><td>是</td><td>训练分布内变化或固定</td><td>学会稳定、可复用的循环算子</td><td>Huginn、Ouro、Loopie</td></tr>
+              <tr><td>Post-training（SFT/RL）</td><td>是</td><td>通常沿用预训练结构</td><td>塑造推理、指令与行为</td><td>Ouro Thinking、Loopie SPT/RL</td></tr>
+              <tr><td>Frozen-weight depth scaling</td><td>否</td><td>是</td><td>用更多前向循环换能力</td><td>Huginn、FLT、STARS 等</td></tr>
+              <tr><td>TTT / test-time adaptation</td><td>临时更新，之后 reset</td><td>可固定也可变化</td><td>根据当前 prompt/任务调整少量参数</td><td>Loop-TTT 博客实验</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>第一条是根本。一个模型如果在预训练中从未学过递归动力学，推理时简单把某层多跑几次，通常不会自动得到稳定收益。Huginn 在训练中随机采样 recurrence count；Ouro 直接在多步输出上训练，并学习自适应退出；Loopie 则从头以两次 layer-loop 训练。它们都不是对普通 checkpoint 的无训练改装。</p>
+        <p>第二条是基础模型训练完成后的行为塑造。Loopie 将一个大规模 target-only supervised 阶段称为 <strong>Supervised Pre-Training（SPT）</strong>，之后还有数学与代码 RL。尽管名字里有 pre-training，从生命周期看，它已经位于 base pretraining 之后。其最终 Thinking 模型的竞赛成绩，是 looped pretraining、SPT、RL 和 generate–verify–refine 共同作用的结果，不能全部归因于 layer-loop。</p>
+        <p>第三条只改变推理循环次数，不更新参数。很多论文把它称为 test-time scaling 或 test-time adaptation，但后一个名字很容易造成误解。Fully Looped Transformer 论文中的相关实验，实质是<strong>冻结参数后改变 loop depth</strong>，并不是用梯度在测试样本上适配模型。</p>
+        <p>第四条才是严格意义上的 TTT：推理时根据当前输入计算 loss，做一次或少数几次梯度更新，完成后重置参数。它有反向传播和 optimizer 成本，不能与“多做几次前向”放进同一个延迟预算里比较。</p>
+        <h2>5. Huginn：从预训练开始学习递归深度</h2>
+        <p>Huginn 是理解现代 looped LLM 的一个好起点。它把模型拆成 prelude、recurrent core 和 coda：前者将 token 表示送入循环，core 反复更新隐藏状态，coda 再输出 logits。论文中的 3.5B 模型采用 2–4–2 的物理层结构，4 层 recurrent core 平均执行 32 次，对应有效深度约为 <code>2 + 4 × 32 + 2 = 132</code>。</p>
+        <p>关键不是把 4 层机械复制 32 次，而是训练时让循环次数服从一个随机分布，并只对最后若干轮做截断反向传播。这样，模型不会把某个固定的 <code>r</code> 当作绝对位置，而是被迫学习一种能在不同深度继续工作的更新过程。</p>
+        <p>Huginn 还说明，大规模循环训练远比小实验脆弱。论文报告的早期 run 出现了表示塌缩或递归失效，sandwich RMSNorm、反复注入输入和初始化方式都成为必要条件。模型最终训练约 800B tokens，论文观察到在训练分布附近增加循环深度可以继续改善若干任务，并探索了基于状态收敛的 per-token 自适应计算、连续 CoT warm start 和 self-speculative decoding。</p>
+        <p>这组结果支持两个判断。</p>
+        <p>第一，latent recurrence 可以在真实语言模型预训练中学出来，而不仅是 synthetic regression 上的技巧。第二，隐藏状态确实表现出某些收敛、轨道或逐步移动的结构。但把这些轨迹直接称作“模型在隐藏空间写了一条不可见 CoT”，仍然属于解释，不是可识别的因果事实。我们能确认的是状态被反复变换，并且某些任务受益；不能仅凭可视化确认每一轮对应了什么人类可读的推理步骤。</p>
+        <h2>6. Ouro：参数效率成立，但共享深度不等于独立深度</h2>
+        <p>Ouro 把 model-loop 做得更完整。它对同一物理 stack 反复循环，并在各轮设置 exit gate，让模型根据样本分配深度。为了避免 gate 总是选择最深一轮，训练目标还包含熵正则；后续阶段冻结语言模型，只训练更尖锐的深度分配。</p>
+        <p>Ouro 的公开结果给了 loop 路线一个强信号：1.4B 与 2.6B 模型在部分 benchmark 上可以接近更大模型，论文将其概括为约 2–3 倍 parameter efficiency。它还用受控的 synthetic knowledge 实验区分了“存储知识”和“组合知识”：增加 loop 并不会凭空扩大事实存储，却能改善多跳组合与知识操作。这与第三条 scaling 轴的解释相符——loop 增加的是处理已有表示的次数，不是新增存储槽位。</p>
+        <p>但 Ouro 附录中一个不那么醒目的结果，比 headline 更重要：<strong>在模型大小、训练 token 与循环执行次数都相同的受控条件下，拥有独立层参数的标准 Transformer 仍然优于 LoopLM。</strong>而且循环越深，差距一度越大；模型规模增加后差距有所缩小。</p>
+        <p>这恰好说明 loop 的真实命题不是“共享深度比自由深度更强”，而是：</p>
+        <blockquote>当参数存储、通信、部署或系统效率构成约束时，能否用共享深度获得更好的整体交换率？</blockquote>
+        <p>独立层可以在不同深度专门化，理论上自然更有表达力。Loop 的优势必须来自参数复用、训练规模、动态深度或系统效率，而不是假设共享本身没有代价。</p>
+        <h2>7. 为什么多循环会失效：这首先是一个动力系统问题</h2>
+        <p>把 recurrent core 写成</p>
+        <div class="method-note formula-note"><code>h<sub>t+1</sub> = Φ<sub>θ</sub>(h<sub>t</sub>; x)</code></div>
+        <p>就能看到问题：每多循环一次，都是对当前状态再应用一次同一个非线性动力系统。训练过的深度范围只是这个系统轨迹的一段；走得更远，可能收敛，也可能振荡、漂移、爆炸或掉进错误吸引子。</p>
+        <h3>7.1 残差爆炸与循环振荡</h3>
+        <p>Fully Looped Transformer 报告了两个典型现象：训练早期的梯度振荡，以及随着 loop count 增长的 residual explosion。原始 looped baseline 在小模型实验中增加到 9 或 12 轮时会塌掉。</p>
+        <p>论文提出两项不增加参数的改动。一是让上一轮输出对每个物理层都可见，而不只在循环入口注入；二是 Attention Injection，用上一轮状态作为 query、当前层状态作为 key/value，并复用现有 attention projection。其 127M/318M 规模实验中，模型在 12 轮内稳定得多；在一组报告的平均分上，原始模型从 3 轮的 40.52 降到 6 轮的 36.56，而 Fully Looped 从 3 轮的 39.90 提高到 9 轮的 41.72。</p>
+        <p>论文所说的 13.2% 是特定设置下、6 轮时相对原始 looped baseline 的相对提升，不是“所有任务提升 13.2 个点”。而且模型规模只有数亿参数。这项工作的价值是提出失效模式与结构修正，不是完成 frontier 外推。</p>
+        <h3>7.2 仅让状态有界，也不保证它有用</h3>
+        <p>STARS 进一步用 Jacobian 的谱半径描述局部稳定性。如果状态附近的 Jacobian <code>J = ∂Φ/∂h</code> 满足谱半径 <code>ρ(J) &lt; 1</code>，扰动会局部收缩；若长期大于 1，误差可能被循环放大。</p>
+        <p>论文用一次 power iteration 估计谱半径，并把 Jacobian Spectral Radius Regularization 与随机 loop sampling 结合。在 Ouro-1.4B、NuminaMath 400K 样本的微调实验中，基础 Ouro 的平均成绩从 <code>r=4</code> 时 67.41 降到 <code>r=8</code> 时 55.09；普通 SFT 从 70.46 降到 52.97；STARS 则从 74.18 降到 65.55。它显著减轻了深循环退化，但依然没有让准确率随深度单调上升。</p>
+        <p>这个结果很好地提醒我们：<strong>稳定性是必要条件，不是能力保证。</strong>一个动力系统可以稳定收敛到无用的 fixed point；也可能虽然有界，却把不同输入压到难以区分的吸引子。</p>
+        <h3>7.3 Dense supervision 的 readout blind spot</h3>
+        <p>另一个更隐蔽的问题来自 normalization。很多模型在每轮都用 cross-entropy 监督退出结果，看上去已经是“dense supervision”。但如果 logits 之前有 RMSNorm 或 LayerNorm，readout 对隐藏状态整体尺度近似不敏感：放大 <code>h</code> 不会改变归一化后的方向，因此即时 CE 对径向尺度几乎不给梯度。</p>
+        <p>问题在于，pre-norm recurrent path 下一轮接收到的仍是未被 readout 控制的原始状态。尺度可以在循环里不断累积，而每轮 loss 看不见它。<strong>The Readout Blind Spot</strong> 在 44M/129M 模型上观察到，使用 per-loop CE 加归一化 readout 时最终 hidden norm 可达到 39,207/56,051；换成能看到原始尺度的 readout，或显式加入 norm penalty，状态量级降到几十，并重新获得随 loop count 改善的 perplexity。</p>
+        <p>这解释了为什么“每轮都算 loss”仍可能训练不出有用循环，也解释了另一个评测陷阱：如果 exit gate 总在很浅的位置停止，不一定说明模型学会了高效自适应计算，也可能说明后续循环根本没有信息增益。Ouro 在 loop 间使用 RMSNorm，缓解了这一特定问题；但论文的大规模验证仍是 sanity check，主要因果证据来自小模型。</p>
+        <h2>8. Loopie：layer-loop 的价值首先体现在系统—模型协同</h2>
+        <p>Loopie 是目前最适合讨论“loop 能否转化成真实训练收益”的案例之一。它不是简单把一个 48 层模型的每层跑两遍，而是先把 stored depth 大约减半，再用 <code>R=2</code> 的 layer-loop 恢复有效执行深度，并把节省的内存重新投入 width、depth 与 batch 组织。</p>
+        <p>论文给出的 Qwen3-like 参考模型约为 30B-A3B、48 层、hidden size 2048；选出的 Loopie 约为 20B-A2B、27 层、hidden size 2304，每层循环两次。按 block 计算代理估算，Loopie 的名义计算量约为参考模型的 1.42 倍，参考 microbatch 下的 activation proxy 约为 0.63 倍。更少的物理层使它能够把 microbatch 加倍、gradient accumulation 减半，最终让实测 optimizer-step time 接近对照。</p>
+        <p>所以 Loopie 所谓 compute-matched，准确理解是：<strong>在固定硬件、token、更新次数并接近 step time 的口径下匹配，而不是理论 FLOPs 完全相等。</strong>这是一个很有价值的工程结果，也说明仅看参数量或 FLOPs 都不够。</p>
+        <p>预训练曲线中，Loopie 大约在 600B tokens 后超过 vanilla 对照；model-loop 与 layer-loop 的对照则在约 1.2T tokens 后出现反转。论文还构建了从 0.15B 到 1B active parameters 的 scaling ladder，以接近 wall-clock 的成对配置比较，并在各 rung 上观察到 Loopie 优势。一个 6B-A0.6B 的受控消融去掉 layer-loop schedule 后变差，也支持收益不只是“偷偷多算了”。</p>
+        <p>但这里仍有三层限制。</p>
+        <p>第一，scaling ladder 的公开最大 baseline 只有约 1B active parameters，离 frontier 规模还有距离。第二，最终 20B-A2B Thinking 模型还叠加了约 2T supervised tokens、数学/代码 RL，以及竞赛时的 generate–verify–refine。第三，论文选择 <code>R=2</code> 是因为固定预训练预算下更深循环边际回报下降，并不意味着 <code>R=2</code> 是所有架构的最佳值。</p>
+        <p>因此 Loopie 最强的结论不是“looped model 已经在所有 benchmark 超过大模型”，而是：<strong>layer-loop 有机会把参数共享转化为 activation、pipeline 与 batch efficiency，再通过联合设计获得更好的 wall-clock frontier。</strong>这比单纯讨论“相同参数跑两遍”更接近 loop 的工程价值。</p>
+        <h2>9. 用 Scaling Ladder 评估，而不是只看一次大训练</h2>
+        <p>Loop Transformer 特别需要 scaling ladder。原因很简单：小模型上的 recurrence 收益，可能会随着宽度、数据量、训练时长和硬件并行策略改变；单个大 run 又很难区分收益来自架构、更多 FLOPs，还是更好的 recipe。</p>
+        <p>一个有解释力的 ladder 至少应做到：</p>
+        <ol>
+          <li>在多个规模 rung 上保持数据分布、tokenizer、optimizer、训练阶段与评测一致；</li>
+          <li>明确匹配的是理论 FLOPs、tokens、step time、总 wall-clock，还是硬件预算；</li>
+          <li>分别报告 stored/active parameters、物理层数、循环次数与有效 block executions；</li>
+          <li>每个 rung 都有不循环对照，并做“只加计算”“只改共享位置”等消融；</li>
+          <li>先用中小规模估计趋势，再用少量大规模 checkpoint 校正外推。</li>
+        </ol>
+        <p>这里的 TPP 通常指 <strong>tokens per parameter</strong>，即训练 token 数与某一参数口径的比值 <code>D/N</code>。对 dense 模型，<code>N</code> 相对明确；对 MoE 必须说明分母是 total parameters 还是 active parameters。Loopie 的 ladder 使用接近 1000 倍 active-parameter tokens 的口径（最大 rung 受 token cap 限制）。固定 TPP 能让不同规模大致处在相近的数据—参数训练阶段，但它并不等价于固定总 FLOPs，也不保证固定 wall-clock。</p>
+        <p>如果团队还定义了 CE（compute efficiency）一类综合指标，则必须同时公开公式、基线、分母和聚合方式。CE 并不是跨论文统一的标准单位。最稳妥的公共表达仍是：在明确资源约束下画 performance–compute frontier，并判断某个架构是否把曲线向外推。</p>
+        <p>对 loop 来说，我会建议同时画三条 frontier：</p>
+        <ul>
+          <li>quality vs. stored parameters：回答参数效率；</li>
+          <li>quality vs. training wall-clock / FLOPs：回答训练效率；</li>
+          <li>quality vs. inference latency / executed FLOPs：回答推理效率。</li>
+        </ul>
+        <p>只有第一条改善，可能只是用计算换内存；三条都改善，才接近真正的架构突破。</p>
+        <h2>10. 推理时增加 loop：深度不是一个无限可拧的旋钮</h2>
+        <p>Loop 模型最诱人的叙事，是训练一次，测试时按问题难度动态增加循环。公开证据支持“训练分布内可调”，却还不支持“任意向外延长”。</p>
+        <p>Huginn 通过训练时随机 recurrence，使模型能在一段深度范围内继续工作；Ouro 学习 exit gate；Fully Looped 和 STARS 也显示结构与正则可以把稳定范围推远。但多个实验都出现同一模式：增加到训练深度附近有收益，超过该范围后波动、退化甚至塌缩。</p>
+        <p>这和显式 CoT 的 test-time scaling 不完全一样。显式生成每一步都会把新 token 写入上下文，并通过 next-token 训练得到直接监督；latent loop 反复更新同一组状态，其轨迹受共享动力系统约束。多一轮不是“免费多想一步”，而是把状态送到训练分布更远的位置。</p>
+        <p>更严谨的产品策略应当是：</p>
+        <ul>
+          <li>将 loop count 视为训练条件，而不是纯推理超参数；</li>
+          <li>对不同任务校准深度—质量—延迟曲线；</li>
+          <li>让 exit decision 依赖可验证的边际收益，而不只是状态看似收敛；</li>
+          <li>把超过训练最大深度的结果明确标为 extrapolation；</li>
+          <li>与显式 reasoning tokens、verifier、self-consistency 在相同延迟预算下比较。</li>
+        </ul>
+        <h2>11. TTT 是另一条路线：更新参数，而不是只增加深度</h2>
+        <p>Alvin Zhou 的 Loop-TTT 博客提供了一个很有启发、也很容易被误读的实验。作者使用 Ouro-1.4B base，在训练深度 <code>r=4</code> 处，根据 prompt entropy 对 97 个 RMSNorm scale vector 做一次梯度更新，总计 198,656 个标量，只占模型约 0.014%；每个 batch 完成后重置。</p>
+        <p>在 500 道 GSM8K 4-shot 样本上，成绩从 0.766 提升到 0.848，增加 8.2 个百分点；单纯把 loop 从 <code>r=4</code> 加到 <code>r=8</code> 反而只有 0.694。MATH-500 子集约提升 3 点，MMLU 子集近乎不变。结果说明，对共享 recurrent operator 做极少量临时校准，可能比把同一算子盲目多跑几轮更有效。</p>
+        <p>但最有价值的其实是作者自己的反证实验：完整增益中，绝大部分来自所有问题共享的 4-shot demonstrations，而不是每道新题的个性化信息。只用 exemplars 更新能取得约 +7.0；缓存一条固定更新向量也能恢复大部分收益；不同 batch 的更新方向 cosine similarity 达到 0.99。更准确的描述因此不是“模型在每道题上在线学习”，而是<strong>一种可缓存的 prompt/task calibration</strong>。</p>
+        <p>此外，这还是探索性博客结果：超参数通过观察 GSM8K test accuracy 调整；没有与更强 post-trained Ouro 比较；TTT 需要前向、反向与 optimizer，尚未做严格等延迟匹配；同样更新在 Qwen2.5-3B 上几乎无收益。因此它适合放在 loop 生态的前沿旁支，而不应拿来证明 loop pretraining 已经成熟。</p>
+        <h2>12. 当前证据到底支持什么</h2>
+        <p>把现有工作放在一起，可以得到一张更克制的结论表。</p>
+        <div class="table-wrap">
+          <table class="post-table">
+            <thead><tr><th>判断</th><th>当前证据</th><th>仍缺什么</th></tr></thead>
+            <tbody>
+              <tr><td>共享参数可以学到迭代更新规则</td><td>synthetic ICL、Huginn/Ouro 预训练</td><td>更广任务和更大规模的机制验证</td></tr>
+              <tr><td>loop 能提高 parameter efficiency</td><td>Ouro、Loopie 部分对照</td><td>同数据同 recipe 的 frontier 规模复现</td></tr>
+              <tr><td>共享深度能替代独立深度</td><td>只能部分替代；Ouro 受控实验中标准模型仍更强</td><td>何种任务/规模下交换率转正</td></tr>
+              <tr><td>test-time 增加 loop 可提升质量</td><td>训练深度范围内多项正面结果</td><td>可靠的深度外推和按样本路由</td></tr>
+              <tr><td>稳定性问题可以缓解</td><td>FLT、STARS、readout 修正</td><td>大规模、长训练、跨域验证</td></tr>
+              <tr><td>layer-loop 普遍优于 model-loop</td><td>Loopie 给出系统与长程曲线证据</td><td>控制更完整的独立复现与梯度机制分析</td></tr>
+              <tr><td>loop 能降低真实训练成本</td><td>Loopie 展示 step-time 协同</td><td>不同集群、并行策略和规模的可迁移性</td></tr>
+              <tr><td>TTT 能成为通用推理增强</td><td>单一探索性案例有信号</td><td>预注册、等成本、跨模型和无 demo 评测</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>其中最稳定的事实有三条。</p>
+        <p><strong>第一，参数共享和计算共享不是一回事。</strong>Loop 减少的是不同权重的数量，不是每个 token 需要执行的操作数。它最先改善的通常是参数内存、通信和激活组织，是否节省总时间要看系统。</p>
+        <p><strong>第二，循环深度必须在训练中被建模。</strong>随机深度、input injection、per-loop supervision、state normalization、exit gating 或动力学正则不是装饰，而是决定模型有没有学到“可继续运行”的算子。</p>
+        <p><strong>第三，共享算子存在功能冲突和动力学风险。</strong>相隔很远的有效深度可能要求不同变换；normalized readout 可能看不见状态尺度；在训练区间外多跑几轮可能 overthink。这些不是调参噪音，而是 loop 架构的核心问题。</p>
+        <h2>13. 我的判断：有条件乐观</h2>
+        <p>我对 Loop Transformer 的看法是有条件乐观。</p>
+        <p>它最值得期待的形态，并不是把今天的 100 层 Transformer 压成一层然后循环 100 次，而是<strong>保留足够的非共享结构，再有选择地共享那些可以形成稳定迭代的中间计算</strong>。prelude/coda、分组循环、layer-loop、部分 untied layers、recurrent MoE，以及显式 token reasoning 与 latent loop 的混合，都可能比“全模型无差别循环”更实际。</p>
+        <p>下一阶段最关键的研究问题也因此很具体：</p>
+        <ol>
+          <li><strong>共享什么。</strong>哪些层适合局部复用，哪些层必须保持深度专门化？natural sharing 能否通过表示相似度、梯度夹角或功能探针直接验证？</li>
+          <li><strong>循环多久。</strong>如何让 marginal value of compute 可校准，而不是由一个容易作弊的 exit gate 决定？</li>
+          <li><strong>如何保持有用的动力学。</strong>谱半径、状态尺度、方向信息和 attractor 结构，哪些指标真正预测生成质量？</li>
+          <li><strong>如何与 MoE 结合。</strong>循环复用 attention/FFN 时，是共享 expert、动态换 expert，还是让 routing 本身随 recurrence 演化？</li>
+          <li><strong>如何核算系统收益。</strong>训练和推理都应报告 step time、吞吐、activation、KV、通信和能耗，而不只报告 stored parameters。</li>
+          <li><strong>如何与显式推理协同。</strong>哪些计算适合留在连续隐藏状态中，哪些步骤值得写成 token 供 verifier、工具或用户读取？</li>
+        </ol>
+        <p>如果这些问题能在可靠的 scaling ladder 上得到回答，模型规模的讨论会从“有多少参数”走向一个更完整的资源平面：保存多少权重、执行多少潜在更新、生成多少显式轨迹。</p>
+        <p>Loop Transformer 的真正意义也许就在这里。它没有取消 scaling，而是让 scaling 从一条线变成了至少三维的设计空间。</p>
+        <hr>
+        <h2>参考资料</h2>
+        <ol class="source-list">
+          <li>Dehghani et al., <a href="https://arxiv.org/abs/1807.03819" target="_blank" rel="noreferrer">Universal Transformers</a>, 2018/ICLR 2019.</li>
+          <li>Lan et al., <a href="https://arxiv.org/abs/1909.11942" target="_blank" rel="noreferrer">ALBERT: A Lite BERT for Self-supervised Learning of Language Representations</a>, 2019/ICLR 2020.</li>
+          <li>Bai et al., <a href="https://arxiv.org/abs/1909.01377" target="_blank" rel="noreferrer">Deep Equilibrium Models</a>, 2019/NeurIPS 2019.</li>
+          <li>Yang et al., <a href="https://arxiv.org/abs/2311.12424" target="_blank" rel="noreferrer">Looped Transformers are Better at Learning Learning Algorithms</a>, ICLR 2024.</li>
+          <li>Geiping et al., <a href="https://arxiv.org/abs/2502.05171" target="_blank" rel="noreferrer">Scaling up Test-Time Compute with Latent Reasoning: A Recurrent Depth Approach</a>, 2025.</li>
+          <li>Zhu et al., <a href="https://arxiv.org/abs/2510.25741" target="_blank" rel="noreferrer">Scaling Latent Reasoning via Looped Language Models</a>（Ouro）, 2025.</li>
+          <li>Fu et al., <a href="https://arxiv.org/abs/2605.18797" target="_blank" rel="noreferrer">Simply Stabilizing the Loop via Fully Looped Transformer</a>, 2026.</li>
+          <li>Yang et al., <a href="https://arxiv.org/abs/2605.26733" target="_blank" rel="noreferrer">Stabilizing Recurrent Dynamics for Test-Time Scalable Latent Reasoning in Looped Language Models</a>（STARS）, 2026.</li>
+          <li>Sharma and Vu, <a href="https://arxiv.org/abs/2606.24898" target="_blank" rel="noreferrer">Dense Supervision Is Not Enough: The Readout Blind Spot in Looped Language Models</a>, 2026.</li>
+          <li>Gao et al., <a href="https://arxiv.org/abs/2607.16051" target="_blank" rel="noreferrer">Loop the Loopies!</a>（Loopie）, 2026.</li>
+          <li>Alvin Zhou, <a href="https://alvinzh04.github.io/blog/looped-ttt.html" target="_blank" rel="noreferrer">Loop deeper, or adapt? Test-time training in looped transformers</a>, 2026.</li>
+        </ol>
+      </div>
+    </article>
+  </main>
+
+  <script src="../assets/script.js?v=20260525"></script>
+</body>
+</html>
