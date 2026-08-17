@@ -279,6 +279,107 @@ html {
   font-weight: 700;
 }
 
+.research-highlight {
+  position: relative;
+  overflow: hidden;
+  border-color: rgba(198, 90, 31, 0.32);
+  background: linear-gradient(135deg, rgba(255, 250, 242, 0.94), rgba(244, 238, 226, 0.9));
+}
+
+.research-highlight::after {
+  content: "";
+  position: absolute;
+  width: 180px;
+  height: 180px;
+  right: -72px;
+  top: -92px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(31, 111, 198, 0.16), rgba(31, 111, 198, 0));
+  pointer-events: none;
+}
+
+.research-highlight__kicker {
+  color: var(--accent);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.research-highlight__title {
+  margin: 7px 0 9px;
+  font-family: "IBM Plex Serif", serif;
+  font-size: 24px;
+  line-height: 1.25;
+}
+
+.research-highlight__lead {
+  max-width: 840px;
+  margin: 0;
+  color: var(--ink);
+  font-size: 14px;
+  line-height: 1.65;
+}
+
+.research-highlight__metrics {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.research-highlight__metrics div {
+  padding: 11px 13px;
+  border: 1px solid rgba(198, 90, 31, 0.2);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.56);
+}
+
+.research-highlight__metrics strong,
+.research-highlight__metrics span {
+  display: block;
+}
+
+.research-highlight__metrics strong {
+  color: var(--accent);
+  font-family: "IBM Plex Serif", serif;
+  font-size: 20px;
+}
+
+.research-highlight__metrics span {
+  margin-top: 2px;
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.research-highlight__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(198, 90, 31, 0.18);
+}
+
+.research-highlight__formula {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+
+.research-highlight__link {
+  color: var(--accent-2);
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.research-highlight__link:hover {
+  text-decoration: underline;
+}
+
 .blog-list {
   margin-top: 12px;
   display: grid;
@@ -754,6 +855,16 @@ html {
 
   .idea-triad {
     grid-template-columns: 1fr;
+  }
+
+  .research-highlight__metrics {
+    grid-template-columns: 1fr;
+  }
+
+  .research-highlight__footer {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 8px;
   }
 
   .post-heading {
