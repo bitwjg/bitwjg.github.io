@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="梳理 AI4AI 与递归自我改进的概念边界、双循环结构、Gödel Machine 技术谱系、评测标准与行业进展。" />
+  <link rel="canonical" href="https://bitwjg.github.io/posts/2026-08-25-ai4ai-to-rsi.html" />
+  <title>从 AI4AI 到 RSI | Jingang Wang</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600&amp;family=IBM+Plex+Serif:wght@400;600&amp;display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/style.css?v=20260817" />
+</head>
+<body>
+  <nav class="masthead">
+    <div class="masthead__inner">
+      <a class="masthead__title masthead__home" href="../index.html">王金刚</a>
+      <div class="masthead__nav">
+        <a href="../index.html#about">关于我</a>
+        <a href="../index.html#publications">论文列表</a>
+        <a href="../index.html#education-experience">教育 / 经历</a>
+        <a href="../blog.html">博客</a>
+      </div>
+    </div>
+  </nav>
+  <section class="banner">
+    <div class="banner__inner"><div class="banner__text">Wir müssen wissen, wir werden wissen</div></div>
+  </section>
+
+  <main class="single-page single-page--article">
+    <article class="section post research-post">
+      <a class="back-link" href="../blog.html">返回博客</a>
+      <div class="section-heading post-heading">
+        <div>
+          <div class="post-kicker">AI4AI 与递归自我改进</div>
+          <h1 class="post-title">从 AI4AI 到 RSI</h1>
+          <p class="post-subtitle">大模型自进化的技术路径与行业图景</p>
+        </div>
+      </div>
+      <div class="blog-meta">2026年8月25日 · 技术概览</div>
+
+      <div class="post-language" lang="zh-CN">
+        <blockquote>2026 年 4 月开始系统调研，公开资料截于 2026 年 8 月 16 日。</blockquote>
+        <p>AI 已经开始参与代码、数据、训练、评测和实验迭代。更关键的问题是：一次改进能否让系统更有效地完成下一轮改进？</p>
+        <p>当前公开进展主要集中在 Bounded RSI：任务、预算和可修改对象有明确边界，每轮改动都能验证和回滚。严格 RSI 还要求新版系统在相同预算下，比旧版系统更有效地产生下一代。公开结果尚未证明这种能力能够持续增强。</p>
+        <h2>1. AI4AI、Auto Research 与 RSI</h2>
+        <p>三个概念分别描述改进对象、工作方式和跨代能力：</p>
+        <div class="table-wrap">
+          <table class="post-table">
+            <thead><tr><th>概念</th><th>核心问题</th><th>范围</th></tr></thead>
+            <tbody>
+              <tr><td><strong>AI4AI</strong></td><td>AI 在改进什么？</td><td>模型、数据、训练配方、Harness、评测器和 AI 基础设施</td></tr>
+              <tr><td><strong>Auto Research</strong></td><td>研究怎样完成？</td><td>Agent 自主完成检索、假设、实验、诊断和写作</td></tr>
+              <tr><td><strong>RSI</strong></td><td>改进能否跨代增强？</td><td>第 <code>t+1</code> 代需要比第 <code>t</code> 代更擅长改进后续系统</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>三个概念没有简单的包含关系。一个系统可以自动完成研究，但不改进 AI；也可以用 AI 改进模型或训练系统，却没有形成跨代反馈。一项覆盖 1,250 篇论文的 <a href="https://arxiv.org/abs/2607.07663" target="_blank" rel="noreferrer">RSI 综述</a> 也用“修改什么”和“谁关闭循环”两条轴整理相关工作，分别对应改进对象和研究流程；是否具备跨代增强能力，还需要单独检验。</p>
+        <p><a href="https://periodic.com/" target="_blank" rel="noreferrer">Periodic Labs</a> 展示了第一类边界：系统可以自主提出候选、安排实验并读取反馈，属于 Auto Research；它优化材料和物理系统，因此不属于本文讨论的 AI4AI。<a href="https://deepmind.google/discover/blog/alphaevolve-a-gemini-powered-coding-agent-for-designing-advanced-algorithms/" target="_blank" rel="noreferrer">AlphaEvolve</a> 展示了第二类边界：它改进过数据中心调度、芯片设计和 AI 训练内核，其中改进 AI 基础设施的任务属于 AI4AI；但公开结果衡量的是产出算法的质量，没有检验改动后的系统是否更擅长产生下一代，因此还不能据此判断 RSI 已经成立。</p>
+        <p>严格 RSI 的最低判据是：</p>
+        <blockquote><strong>在可控预算下，第 <code>t+1</code> 代系统能否比第 <code>t</code> 代更有效地改进下一代？</strong></blockquote>
+        <h2>2. AI4AI 系统怎样运行</h2>
+        <p>Coding Agent、ML engineering 和训练优化适合检验自改进机制。任务链路足够长，编译器、测试、训练日志和 benchmark 又能及时返回结果。</p>
+        <p>一个可运行的系统包含两个不同时间尺度的循环：</p>
+        <figure class="research-chart">
+          <iframe
+            src="../assets/ai4ai-double-loop-interactive.html"
+            title="AI4AI 任务执行内环与研究系统改进外环"
+            loading="lazy"
+            style="display: block; width: 100%; height: min(760px, 165vw); min-height: 600px; border: 1px solid var(--stroke); border-radius: 14px; background: var(--card);"
+          ></iframe>
+          <figcaption>图 1｜AI4AI 双循环：内环执行任务并纠错，外环根据运行轨迹修改研究系统，再用固定预算的 Dev 和 held-out 任务验收。</figcaption>
+        </figure>
+        <p><code>S_t</code> 在内环中执行和纠错；外环汇总运行记录、修改研究系统，并用固定预算的 Dev 和 held-out 任务决定发布或回滚。</p>
+        <p>改动可以落在三个层面：</p>
+        <div class="table-wrap">
+          <table class="post-table">
+            <thead><tr><th>层面</th><th>主要对象</th></tr></thead>
+            <tbody>
+              <tr><td><strong>模型层</strong></td><td>数据、架构、目标函数、优化器和训练配方，覆盖 pre-training、mid-training、post-training、蒸馏与持续学习等</td></tr>
+              <tr><td><strong>Agent 系统层</strong></td><td>Harness、Context、Tool、Skill、Memory、路由、循环控制和失败恢复</td></tr>
+              <tr><td><strong>计算系统层</strong></td><td>数据流水线、Kernel、Compiler、分布式训练、推理引擎和资源调度</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>三个层面共用同一验收层。如果验收层也纳入修改范围，需要在外部保留固定的回归测试和回滚规则，防止评分规则随系统一起漂移。</p>
+        <p>Harness 决定任务如何呈现、工具何时调用、反馈如何返回，以及经验能否跨轮保留和复用。同一策略在不同模型上可能产生相反效果，因此需要 model × harness 交叉实验。<a href="https://arxiv.org/abs/2608.10178" target="_blank" rel="noreferrer">One Recipe, Many Harnesses</a> 也显示，共享抽象可以迁移，语言相关组件仍需分别优化。</p>
+        <p>自动研究已经从 post-training 延伸到 pre-training。<a href="https://github.com/KellerJordan/modded-nanogpt" target="_blank" rel="noreferrer">modded-nanogpt</a> 提供可快速验证的训练环境；<a href="https://github.com/karpathy/autoresearch" target="_blank" rel="noreferrer">Karpathy autoresearch</a> 让 Agent 持续修改训练代码、优化器和训练配方。8 月 16 日，<a href="https://primeintellect.ai/blog/measuring-autonomous-research" target="_blank" rel="noreferrer">Prime Intellect</a> 公布了 18 个模型参与的 153 次多日运行。每次使用 8×H200，最长运行 8 天；最佳结果把达到目标损失所需的步数从 3290 降至 2726。</p>
+        <p>较强的 Agent 更会管理种子、实验噪声、消融和失败方案。最终保留的改动仍来自已有优化技巧，各模型的 Harness 和运行预算也不完全相同。这项实验说明 pre-training 配方可以进入长周期自动优化；它没有测试前沿规模迁移，也没有比较新旧 Research Agent 的改进能力。</p>
+        <p>计算系统层面也出现了类似工作。<a href="https://arxiv.org/abs/2608.09874" target="_blank" rel="noreferrer">ArchAgent v2</a> 自动演化三级数据预取器，在 DPC4 同规则下比此前人工冠军高 0.3% 几何平均 IPC。长时间仿真仍限制搜索规模，Agent 自身也没有进入改进对象。</p>
+        <p>双循环描述系统结构，RSI 分级进一步判断修改如何产生、选择，以及改进者能否跨代增强。</p>
+        <h2>3. RSI分级</h2>
+        <p>Gödel Machine、Darwin Gödel Machine、Huxley-Gödel Machine 和 Hyperagents 描述系统怎样产生和选择修改；<a href="https://www.weco.ai/blog/4-levels-of-recursive-self-improvement" target="_blank" rel="noreferrer">Weco L0–L3</a> 分别衡量闭环自治、研发生产率和递归动力学。L2 才开始检验跨代 improver 能力。</p>
+        <div class="table-wrap">
+          <table class="post-table">
+            <thead><tr><th>机制</th><th>核心做法</th><th>当前边界</th></tr></thead>
+            <tbody>
+              <tr><td><a href="https://arxiv.org/abs/cs/0309048" target="_blank" rel="noreferrer">Gödel Machine</a></td><td>证明修改能够提高预期效用后，程序才重写自身</td><td>真实但无法形式化证明的改进会被忽略</td></tr>
+              <tr><td><a href="https://arxiv.org/abs/2505.22954" target="_blank" rel="noreferrer">Darwin Gödel Machine</a></td><td>用变异、benchmark 实测和多谱系选择改写 Coding Agent</td><td>搜索仍受固定 benchmark 和外层选择规则约束</td></tr>
+              <tr><td><a href="https://arxiv.org/abs/2510.21614" target="_blank" rel="noreferrer">Huxley-Gödel Machine</a></td><td>估计各 clade 的 metaproductivity（CMP），据此选择搜索树的扩展方向</td><td>expansion 和 evaluation policy 固定，尚未比较新旧 improver</td></tr>
+              <tr><td><a href="https://arxiv.org/abs/2603.19461" target="_blank" rel="noreferrer">Hyperagents</a></td><td>将任务 Agent 与产生改进的元程序放入同一可编辑系统</td><td>任务分布、父代选择和最外层评估仍由外部固定</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>Weco 从研发生产率和跨代反馈划分四个阶段：</p>
+        <div class="table-wrap">
+          <table class="post-table">
+            <thead><tr><th>等级</th><th>判断标准</th></tr></thead>
+            <tbody>
+              <tr><td><strong>L0：Autonomous Delegation</strong></td><td>研发闭环能够自主运行，但固定预算下仍弱于公平的人类基线</td></tr>
+              <tr><td><strong>L1：Net-positive</strong></td><td>固定物理预算下超过公平的人类研发基线；收益形成多步趋势，并迁移到优化目标之外的任务或指标</td></tr>
+              <tr><td><strong>L2：Ignition</strong></td><td>新版 improver 比旧版 improver 更有效地产生下一代</td></tr>
+              <tr><td><strong>L3：Inflection</strong></td><td>正反馈超过研发难度增长，固定预算下的代际增益持续扩大</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>CMP 汇总一个 clade 的后代 benchmark 表现；HGM 估计 CMP，并据此选择搜索树的扩展方向。它把选择信号从当前性能推进到后代生产力，但没有让后代接管 improver 席位进行代际对照。Inflection 还要求新版 improver 反复接管，并使同预算下的代际增益持续扩大。现有 HGM 实验没有确认 Ignition 或 Inflection。</p>
+        <h2>4. 怎样排除“假进步”</h2>
+        <p>最终分数只说明一次运行的结果。额外预算、幸运种子、Harness 变化、数据泄漏和评分漏洞都可能制造涨分。Verifier 决定哪些改动会被保留，benchmark 决定系统朝哪个方向优化，因此两者也要接受检查。</p>
+        <p>本文选择代表性评测与诊断工作时，主要考虑与 AI / ML 研发的相关性、任务真实性、评分方式、预算控制、可复现性、污染风险和外部采用情况。</p>
+        <div class="table-wrap">
+          <table class="post-table">
+            <thead><tr><th>代表性工作</th><th>主要用途与边界</th></tr></thead>
+            <tbody>
+              <tr><td><a href="https://arxiv.org/abs/2411.15114" target="_blank" rel="noreferrer">RE-Bench</a></td><td>用多档时间预算和人类专家对照，检查短时竞争力能否延伸到长期研究</td></tr>
+              <tr><td><a href="https://arxiv.org/abs/2410.07095" target="_blank" rel="noreferrer">MLE-bench</a></td><td>让 scaffold、资源设置、尝试策略和污染控制成为显式评测条件</td></tr>
+              <tr><td><a href="https://arxiv.org/abs/2504.01848" target="_blank" rel="noreferrer">PaperBench</a></td><td>用作者校验 rubric 和专家对照评估论文复现；不测原创研究能力</td></tr>
+              <tr><td><a href="https://arxiv.org/abs/2603.08640" target="_blank" rel="noreferrer">PostTrainBench</a></td><td>直接运行 post-training，暴露目标错位、能力回退和 reward hacking</td></tr>
+              <tr><td><a href="https://arxiv.org/abs/2608.06301" target="_blank" rel="noreferrer">HarnessOpt-Bench</a></td><td>固定调用预算并隔离搜索集和隐藏测试集，区分 Harness 优化与测试集拟合</td></tr>
+              <tr><td><a href="https://primeintellect.ai/blog/measuring-autonomous-research" target="_blank" rel="noreferrer">Prime Intellect nanoGPT Speedrun</a></td><td>展示多日实验为什么需要报告种子、停止规则、GPU 预算、方差和失败回访</td></tr>
+              <tr><td><a href="https://arxiv.org/abs/2608.13417" target="_blank" rel="noreferrer">Beyond Final Scores</a></td><td>把总分拆成过程代理指标、经验复用、Harness 影响和方法新颖性</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <h3>Beyond Final Scores：从总分到过程诊断</h3>
+        <p>《Beyond Final Scores》评估了 7 个前沿模型、36 个长程 AI R&amp;D 任务和 756 条轨迹。报告用三项规则代理指标定位过程瓶颈：C1 以高分首次出现的位置代理有效方向发现，C2 以可执行提交与构建失败代理交付能力，C3 以峰值保留和回退恢复代理反馈控制。这些指标并非对相应能力的完整定义。另一组对照实验观察任务内和跨任务的经验复用。</p>
+        <p>最终分数相近的模型，过程瓶颈可能完全不同。C2 整体较高，差异更多出现在方向选择、结果保持和失败恢复。经验有时改善后续决策，也可能让 Agent 固守错误结论或评分捷径。在 Opus、GPT 和 Kimi 的 Harness 对照中，汇总 avg@3 比 best@3 更敏感，模型总体排序没有改变；分任务结果仍有明显的 model × workload 交互。252 个最佳方案中，111 个被归为组合既有技术（composition-stacking），16 个利用了评测捷径。按报告的保守 rubric，经模型初筛和候选人工复核，只有 3 个保留“新方法”标签。</p>
+        <p>这组对照报告有无保留或注入经验时的分数变化，仍可能混入 rollout 随机性、提示效应和运行时漂移。它适合观察经验复用，不能直接视为跨代自改进，也不能用于确认 Ignition。</p>
+        <h3>从涨分到 RSI</h3>
+        <p><code>一次性 gain → held-out transfer → L1 Net-positive → L2 Ignition → L3 Inflection</code></p>
+        <p>“一次性 gain”和“held-out transfer”是本文增加的验证步骤；L1–L3 沿用 Weco 的动力学分级。前者需要排除额外预算和实现错误，后者要求收益可以重复，并迁移到未参与优化的任务。</p>
+        <p>一套可审计的实验至少要做到：</p>
+        <ul>
+          <li>固定任务、数据、Verifier 和工具版本。</li>
+          <li>隔离开发集与 held-out。</li>
+          <li>固定时间、计算量、尝试次数、工具权限和人工介入。</li>
+          <li>预先说明种子选择、继续运行和停止规则，并报告方差与成本。</li>
+          <li>检查污染、答案记忆、reward hacking、能力回退和违规行为。</li>
+          <li>记录 Skill、Memory 和长期指令的来源、版本、审批与回滚历史。</li>
+        </ul>
+        <p>Verifier 本身也会失效。<a href="https://arxiv.org/abs/2607.28609" target="_blank" rel="noreferrer">OSReward</a> 发现评审器会放过未完成的操作轨迹；<a href="https://arxiv.org/abs/2608.12645" target="_blank" rel="noreferrer">Jagged Judges</a> 显示正确判断可能在持续反驳下翻转；<a href="https://arxiv.org/abs/2608.13547" target="_blank" rel="noreferrer">QuoteBench</a> 将部分性能损失定位到执行解析层。评测需要分别检查 Agent、Verifier 和执行链路。</p>
+        <p>单次修改可标为四类：held-out 稳定增益且成本和风险可接受，记为 <code>valid improvement</code>；开发集收益没有迁移，记为 <code>overfit</code>；泄漏、绕过 Verifier 或修改评分规则带来的高分，记为 <code>unsafe</code>；覆盖不足或方差过大，记为 <code>inconclusive</code>。</p>
+        <p>结论必须对应可回放日志、代码和数据版本、实验矩阵、成本及对照结果。多项组件同时变化时，无法完成可靠归因。</p>
+        <h2>5. 行业进展：四条技术路线与重点团队</h2>
+        <p>公开进展主要沿四条路线展开：</p>
+        <div class="table-wrap">
+          <table class="post-table">
+            <thead><tr><th>路线</th><th>代表工作</th><th>已有进展</th><th>边界</th></tr></thead>
+            <tbody>
+              <tr><td><strong>算法与计算系统优化</strong></td><td><a href="https://arxiv.org/abs/2506.13131" target="_blank" rel="noreferrer">AlphaEvolve</a>、<a href="https://arxiv.org/abs/2608.09874" target="_blank" rel="noreferrer">ArchAgent v2</a></td><td>在算法发现、训练内核和处理器预取器上取得了可验证增益</td><td>优化对象主要是外部算法或系统，Research Agent 没有进入改进对象</td></tr>
+              <tr><td><strong>训练配方搜索</strong></td><td><a href="https://primeintellect.ai/blog/measuring-autonomous-research" target="_blank" rel="noreferrer">Prime Intellect nanoGPT Speedrun</a></td><td>Agent 已能管理多日实验中的种子、噪声、消融和失败方案回访</td><td>前沿规模迁移和跨代改进尚未验证</td></tr>
+              <tr><td><strong>Harness 优化</strong></td><td><a href="https://www.primeintellect.ai/blog/prime-agent#prime-agent" target="_blank" rel="noreferrer">Prime Agent</a>、<a href="https://arxiv.org/abs/2608.06301" target="_blank" rel="noreferrer">HarnessOpt-Bench</a>、<a href="https://arxiv.org/abs/2608.09629" target="_blank" rel="noreferrer">OEO</a>、<a href="https://arxiv.org/abs/2608.12307" target="_blank" rel="noreferrer">AI4AI at Test-Time</a></td><td>开始自动搜索提示词、工具、Skill、Memory 和运行流程，并测试能力迁移</td><td>收益对模型、任务和评测设计敏感，尚无跨代 improver 对照</td></tr>
+              <tr><td><strong>Agent 与元改进机制</strong></td><td>DGM、HGM、Hyperagents、<a href="https://www.weco.ai/blog/first-evidence-of-recursive-self-improvement" target="_blank" rel="noreferrer">Weco AIDE²</a>、<a href="https://arxiv.org/abs/2607.28568" target="_blank" rel="noreferrer">Frontis OpenRSI</a></td><td>已能修改 Agent、Harness，或运行包含环境反馈和训练的外层循环</td><td>尚无同预算的新旧 improver 公开对照支持 Ignition</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>以下聚焦以 AI4AI 或 RSI 为核心定位的创业公司和独立研究团队，并按公开技术产出分组，不穷举所有参与相关工作的实验室。</p>
+        <h3>已公开技术产出的团队</h3>
+        <div class="table-wrap">
+          <table class="post-table">
+            <thead><tr><th>团队</th><th>做什么</th><th>公开了什么</th><th>还缺什么</th></tr></thead>
+            <tbody>
+              <tr><td><a href="https://sakana.ai/careers/member-of-technical-staff-rsi-lab/" target="_blank" rel="noreferrer">Sakana AI RSI Lab</a></td><td>从 Agent-Native Models、AI Scientist 走向 RSI</td><td><a href="https://sakana.ai/ai-scientist/" target="_blank" rel="noreferrer">The AI Scientist</a> 与 DGM 的论文和代码</td><td>同预算的新旧 improver 跨代对照</td></tr>
+              <tr><td><a href="https://www.weco.ai/" target="_blank" rel="noreferrer">Weco AI</a></td><td>在可量化的 ML engineering 任务上探索 Bounded RSI</td><td>AIDE 的论文和代码；AIDE² 由外层 Agent 改写内层研究 Agent 并报告 held-out 增益，公司自评 L1</td><td>AIDE² 完整代码、独立复现和 Ignition 检验</td></tr>
+              <tr><td><a href="https://arxiv.org/abs/2607.28568" target="_blank" rel="noreferrer">Frontis AI / 衔远科技</a></td><td>构建面向 ML engineering 的 Bounded RSI 系统</td><td>Frontis-MA1 权重，以及 OpenMLE-Gym、ERL、Evo <a href="https://github.com/FrontisAI/OpenRSI" target="_blank" rel="noreferrer">代码</a>；OpenMLE Sandbox、NatureBench quickstart 和轨迹分析</td><td>作者报告的 benchmark 结果仍待独立复现；尚无跨代 improver 检验</td></tr>
+              <tr><td><a href="https://www.intology.ai/blog/announcing-zochi-intology" target="_blank" rel="noreferrer">Intology</a></td><td>用 Zochi / Locus 自动完成 AI R&amp;D 与 post-training</td><td><a href="https://www.intology.ai/blog/zochi-tech-report" target="_blank" rel="noreferrer">Zochi 技术报告</a>、<a href="https://github.com/IntologyAI/Zochi" target="_blank" rel="noreferrer">部分成果代码</a>；<a href="https://www.intology.ai/blog/scaling-automated-post-training" target="_blank" rel="noreferrer">Locus 报告</a>称标准 PostTrainBench 得分经 benchmark 作者核验</td><td>完整 Research Agent 尚未开源。PostTrainBench+ 将七项任务总预算扩至 4,500 H100 小时且每项只运行一次，不能与原始十小时口径直接比较；尚无跨代 improver 检验</td></tr>
+              <tr><td><a href="https://inherentlabs.ai/research/training-to-replicate" target="_blank" rel="noreferrer">Inherent</a></td><td>用论文复现任务训练 AI Scientist</td><td><a href="https://arxiv.org/abs/2608.13331" target="_blank" rel="noreferrer">Replica / Faraday</a> 将论文转成可执行任务和评分标准，再后训练 27B 模型；作者报告其在留出复现任务上超过 Claude Opus 4.8 和 GPT-5.5</td><td>独立复现、开放式新假设评测和跨代 improver 检验</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <h3>定位高度契合、公开产出较少的团队</h3>
+        <div class="table-wrap">
+          <table class="post-table">
+            <thead><tr><th>团队</th><th>做什么</th><th>公开了什么</th><th>还缺什么</th></tr></thead>
+            <tbody>
+              <tr><td><a href="https://www.recursive.com/" target="_blank" rel="noreferrer">Recursive Superintelligence</a></td><td>研究 open-ended、AI-generating algorithms 和 AI scientists</td><td>团队、使命和研究主题</td><td>模型、代码和 benchmark</td></tr>
+              <tr><td><a href="https://mirendil.com/" target="_blank" rel="noreferrer">Mirendil</a></td><td>将 pre-training、post-training、RL、eval、Harness 与基础设施整合为 self-accelerating AI R&amp;D</td><td>团队、岗位和工程蓝图</td><td>运行结果和 held-out 验证</td></tr>
+              <tr><td><a href="https://www.discoveryloop.com/" target="_blank" rel="noreferrer">Discovery Loop</a></td><td>先自动化 ML research / engineering，再以自身技术栈为优化对象</td><td>团队与 AI-for-AI 外循环定位</td><td>论文、模型、代码和 benchmark</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <h2>6. RSI 的当前进展与待解问题</h2>
+        <div class="table-wrap">
+          <table class="post-table">
+            <thead><tr><th>问题</th><th>结论</th></tr></thead>
+            <tbody>
+              <tr><td>AI 能否参与并改进 AI 研发？</td><td>可以，已有论文、代码和多日运行结果</td></tr>
+              <tr><td>受约束、可验证的内外循环能否运行？</td><td>可以，已有多个工程原型</td></tr>
+              <tr><td>固定预算下能否超过公平的人类研发基线？</td><td>只有少量作者报告，完整 Artifact、预算可比性和独立复现仍不足</td></tr>
+              <tr><td>新系统能否成为更强的改进者？</td><td>尚无同预算的新旧 improver 公开对照</td></tr>
+              <tr><td>固定预算下的代际增益能否持续扩大？</td><td>尚无可信公开结果</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>仍需回答的问题包括：</p>
+        <ul>
+          <li><strong>搜索与学习的归因</strong>：固定预算后，学习曲线、重复方差和新任务样本效率能否显示经验被真正利用？</li>
+          <li><strong>跨系统迁移</strong>：经验能否跨任务、模型和 Harness 生效？</li>
+          <li><strong>全局回归</strong>：局部 bad case 的修复是否引发遗忘、安全退化或其他能力回退？</li>
+          <li><strong>Verifier 共适应</strong>：Agent、benchmark 和 Verifier 是否在共同寻找评分捷径？</li>
+          <li><strong>研究品味与新颖性</strong>：怎样区分已有技巧的重组与可迁移的新方法？</li>
+          <li><strong>长期审计</strong>：多代运行怎样记录 trace、成本、种子、停止规则和状态变更，并支持回放与回滚？</li>
+          <li><strong>因果归因</strong>：模型、Harness、数据和评测器同时变化时，哪项修改带来了收益？</li>
+        </ul>
+        <p>截至 8 月 16 日，AI4AI 已进入可运行、可验证的工程阶段，公开结果主要支持受约束闭环，少量作者报告触及 L1。L2 Ignition 仍缺少同预算的新旧 improver 对照，L3 Inflection 尚无可信结果。下一步的关键实验，是检验 <code>S_{t+1}</code> 能否在多批 held-out 任务上稳定产生比 <code>S_t</code> 更多的有效改进。</p>
+      </div>
+    </article>
+  </main>
+</body>
+</html>
